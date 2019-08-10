@@ -7,12 +7,14 @@ setup(
   description = 'Particle swarm optimization in machine learning, including gradient free optimization',   # Give a short description about your library
   author = 'Rafael Cabral',                   # Type in your name
   author_email = 'rafael.medeiroscabral@kaust.edu.sa',      # Type in your E-Mail
-  url = 'https://github.com/user/reponame',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',    # I explain this later on
-  keywords = ['machine learning', 'neural networks', 'optimization', 'particle swarm',  'derivative free'],   # Keywords that define your package best
+  url = 'https://github.com/rafaelcabral96/mlswarm',   # Provide either the link to your github or to your website
+  download_url = 'https://github.com/rafaelcabral96/mlswarm/archive/v_01.tar.gz',    # I explain this later on
+  keywords = ['machine learning', 'neural networks',   'optimization', 'particle swarm',  'derivative free'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
-          'validators',
-          'beautifulsoup4',
+          'numpy',
+          'sklearn',
+          'pandas',
+          'matplotlob'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
