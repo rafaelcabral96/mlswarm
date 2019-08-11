@@ -8,12 +8,12 @@ For each, there are three available algorithms:
 2. *swarm_derivfree* - similar to the former but derivative free, by using gaussian clouds
 3. *gradient_descent* - gradient descent optimization
 
-For a *neuralnet* object there are three main methods (see [examples]()):
+For a *neuralnet* object there are three main methods (see [examples](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning)):
 1. nn = neuralnet(...) - define neural network architecture and create neural network
 2. nn = init_cloud(N) - Initialize cloud with N particles
 3. nn.train(...) - Define the training data, algorithm parameters and start the algorithm
 
-For a *function* object there are three main methods (see [examples]()):
+For a *function* object there are three main methods (see [examples](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning)):
 1. func = function(lambda x: ...) - create a function object 
 2. func = init_cloud(...) - Define array of initial particle positions
 3. func.minimize(...) - Define the algorithms parameters and start the algorithm
