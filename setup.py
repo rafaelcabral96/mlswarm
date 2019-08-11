@@ -1,9 +1,6 @@
 from distutils.core import setup
 
 def readme():
-    """
-    Function to read the long description for the MLROSe package.
-    """
     with open('README.md') as _file:
         return _file.read()
 
@@ -12,7 +9,7 @@ def readme():
 setup(
   name = 'mlswarm',         # How you named your package folder (MyLib)
   packages = ['mlswarm'],   # Chose the same as "name"
-  version = '0.21',      # Start with a small number and increase it with every change you make
+  version = '0.23',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'This package trains neural networks using swarm-like optimization algorithms',   # Give a short description about your library
   long_description=readme(),
@@ -20,7 +17,7 @@ setup(
   author = 'Rafael Cabral',                   # Type in your name
   author_email = 'rafael.medeiroscabral@kaust.edu.sa',      # Type in your E-Mail
   url = 'https://github.com/rafaelcabral96/mlswarm',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/rafaelcabral96/mlswarm/archive/v021.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/rafaelcabral96/mlswarm/archive/v023.tar.gz',    # I explain this later on
   keywords = ['machine learning', 'neural networks',   'optimization', 'particle swarm',  'derivative free'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'numpy',

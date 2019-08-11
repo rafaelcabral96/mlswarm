@@ -1,4 +1,4 @@
-# Overview: Machine Learning with SWARM optimization algorithms
+# Overview
 
 This package trains neural networks using swarm-like optimization algorithms. 
 
@@ -14,12 +14,12 @@ Diogo A. Gomes (2019). DERIVATIVE FREE OPTIMIZATION USING GAUSSIAN CLOUD ?
 1. *neuralnet* - train neural networks
 2. *function* - minimize functions
 
-For a *neuralnet* object there are three main methods (see [examples](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning)):
+For a *neuralnet* object there are three main methods (see examples):
 1. nn = neuralnet(...) - define neural network architecture and create neural network
 2. nn = init_cloud(N) - Initialize cloud with N particles
 3. nn.train(...) - Define the training data, algorithm parameters and start the algorithm
 
-For a *function* object there are three main methods (see [examples](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning)):
+For a *function* object there are three main methods (see examples):
 1. func = function(lambda x: ...) - create a function object 
 2. func = init_cloud(...) - Define array of initial particle positions
 3. func.minimize(...) - Define the algorithms parameters and start the algorithm
@@ -30,7 +30,7 @@ There are three available optimization algorithms:
 3. *gradient_descent* - gradient descent optimization
 
 ## Examples
-Jupyter notebook examples can be found [here](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning) that perform:
+Jupyter notebook examples can be found [here](https://github.com/rafaelcabral96/mlswarm) that perform:
 1. Minimization of univariate and multivariate functions
 2. Linear Regression
 3. Logistic Regression
