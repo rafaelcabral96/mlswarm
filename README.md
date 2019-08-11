@@ -29,12 +29,12 @@ There are three available optimization algorithms:
 3. *gradient_descent* - gradient descent optimization
 
 ## Examples
-Jupyter notebook examples can be found [here](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning) that performs:
-1. Minimizing univariate and multivariate functions
+Jupyter notebook examples can be found [here](https://github.com/rafaelcabral96/Derivative-Free-Descent---Machine-Learning) that perform:
+1. Minimization of univariate and multivariate functions
 2. Linear Regression
 3. Logistic Regression
-4. 4-Layer Neural Network for binary classification
-5. 4-Layer Neural Network for binary classification using step activation functions
+4. Binary classification with 4-Layer Neural Network
+5. Binary classification with 4-Layer Neural Network using step activation functions
 
 ## Advantages of the swarm-like gradient free optimization
 1. It is possible to use linear and non-differentiable activation functions because there is no backpropagation -  [reference](https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/)
