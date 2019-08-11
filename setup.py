@@ -12,7 +12,7 @@ setup(
   version = '0.25',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'This package trains neural networks using swarm-like optimization algorithms',   # Give a short description about your library
-  long_description = long_description(),
+  long_description = long_description,
   long_description_content_type='text/markdown',
   author = 'Rafael Cabral',                   # Type in your name
   author_email = 'rafael.medeiroscabral@kaust.edu.sa',      # Type in your E-Mail
