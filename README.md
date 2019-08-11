@@ -1,4 +1,5 @@
-# Overview
+#Overview: Machine Learning with SWARM optimization algorithms
+
 This package trains neural networks using swarm-like optimization algorithms. 
 
 By flattening the weights of a neural network, network training can be seen as a problem of directly minimizing a multivariate (cost) function. In this framework, particle swarm optimization algorithms can be used to minimize this multivariate function, where each particle will have a set of neural network weights associated with it.
