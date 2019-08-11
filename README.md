@@ -30,7 +30,7 @@ There are three available optimization algorithms:
 3. *gradient_descent* - gradient descent optimization
 
 ## Examples
-Jupyter notebook examples can be found [here](https://github.com/rafaelcabral96/mlswarm) that perform:
+Jupyter notebook examples can be found on the [github page](https://github.com/rafaelcabral96/mlswarm) that perform:
 1. Minimization of univariate and multivariate functions
 2. Linear Regression
 3. Logistic Regression
