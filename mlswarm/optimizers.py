@@ -1,6 +1,6 @@
 import numpy as np
 import time
-from utils import flatten_weights, flatten_weights_gradients, unflatten_weights, get_var
+from mlswarm.utils import flatten_weights, flatten_weights_gradients, unflatten_weights, get_var
 
 
 def update_cloud_derivative_free(cloudf, cost, lr, N, kernel_a, alpha, beta, gamma):

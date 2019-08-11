@@ -8,7 +8,7 @@ setup(
   author = 'Rafael Cabral',                   # Type in your name
   author_email = 'rafael.medeiroscabral@kaust.edu.sa',      # Type in your E-Mail
   url = 'https://github.com/rafaelcabral96/mlswarm',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/rafaelcabral96/mlswarm/archive/v012.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/rafaelcabral96/mlswarm/archive/v013.tar.gz',    # I explain this later on
   keywords = ['machine learning', 'neural networks',   'optimization', 'particle swarm',  'derivative free'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'numpy',

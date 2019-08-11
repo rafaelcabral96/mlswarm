@@ -1,7 +1,7 @@
 import numpy as np
-from neural_networks import init_layers, full_forward_propagation, full_backward_propagation, get_cost_value, get_accuracy_value
-from utils import timerfunc, get_mean, plot_cost, plot_list, plot_distance_matrix, kernel_a_finder
-from optimizers import update_gd, update_nn_weights, update_nn_weights_derivative_free 
+from mlswarm.neural_networks import init_layers, full_forward_propagation, full_backward_propagation, get_cost_value, get_accuracy_value
+from mlswarm.utils import timerfunc, get_mean, plot_cost, plot_list, plot_distance_matrix, kernel_a_finder
+from mlswarm.optimizers import update_gd, update_nn_weights, update_nn_weights_derivative_free 
 
 
 @timerfunc

@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import log_loss, f1_score
-from utils import convert_prob_into_class, get_mean
+from mlswarm.utils import convert_prob_into_class, get_mean
 
 
 def init_layers(nn_architecture, seed = 99, dispersion_factor = 6):

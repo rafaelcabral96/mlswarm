@@ -1,6 +1,6 @@
-from neural_networks import init_layers, full_forward_propagation, get_accuracy_value
-from utils import get_mean, get_var, plot_cost, plot_list, kernel_a_finder, flatten_weights
-from train import train_nn, train_fmin
+from mlswarm.neural_networks import init_layers, full_forward_propagation, get_accuracy_value
+from mlswarm.utils import get_mean, get_var, plot_cost, plot_list, kernel_a_finder, flatten_weights
+from mlswarm.train import train_nn, train_fmin
 
 import numpy as np
 
