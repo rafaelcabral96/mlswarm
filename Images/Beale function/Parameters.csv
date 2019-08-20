@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
+Beale function,50,9.997191970519287e-06,[2.88375 0.46791],2.5352705940708186e-03,swarm_derivfree,3145,157250,0.930330799999993,0.921875,10000,1e-05,0.001,1,0,5,0,1

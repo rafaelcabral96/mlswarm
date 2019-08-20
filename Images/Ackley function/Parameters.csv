@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Ackley function,100,8.120019982182049e-05,[ 0.00073 -0.00227],6.896396786249426e-03,swarm_derivfree,763,76300,0.45525200000000154,0.4375,100000,0.0001,0.01,0.001,0,1,0,1,0

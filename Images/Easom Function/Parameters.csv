@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Easom Function,100,0.0003865769142338451,[3.14168 3.14168],-9.99999978131905e-01,swarm_derivfree,10000,1000000,17.151703200000014,17.125,10000,0.0001,0.01,0.01,0,1,0,1,0

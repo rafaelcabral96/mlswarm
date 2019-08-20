@@ -3,9 +3,10 @@ from sklearn.metrics import log_loss, f1_score
 from mlswarm.utils import convert_prob_into_class, get_mean
 
 
-def init_layers(nn_architecture, seed = 99, dispersion_factor = 6):
+def init_layers(nn_architecture, seed, dispersion_factor, seed_between, dispersion_factor_between):
+  
     # random seed initiation
-    np.random.seed(seed)
+    np.random.seed(seed_within)
     # number of layers in our neural network
     number_of_layers = len(nn_architecture)
     # parameters storage initiation
@@ -22,11 +23,20 @@ def init_layers(nn_architecture, seed = 99, dispersion_factor = 6):
         
         # initiating the values of the W matrix
         # and vector b for subsequent layers
-        params_values['W' + str(layer_idx)] = np.random.randn(
-            layer_output_size, layer_input_size) * np.sqrt(dispersion_factor/(layer_input_size + layer_output_size))
-        params_values['b' + str(layer_idx)] = np.random.randn(
-            layer_output_size, 1) * np.sqrt(dispersion_factor/(layer_input_size + layer_output_size))
-        
+        params_values['W' + str(layer_idx)] = np.random.randn(layer_output_size, layer_input_size) * np.sqrt(dispersion_factor_within/(layer_input_size + layer_output_size)) 
+        params_values['b' + str(layer_idx)] = np.random.randn(layer_output_size, 1) * np.sqrt(dispersion_factor/(layer_input_size + layer_output_size)) 
+    
+    if dispersion_factor_between > 0:
+        np.random.seed(seed_between)
+        for idx, layer in enumerate(nn_architecture):
+            layer_idx = idx + 1
+            
+            layer_input_size = layer["input_dim"]
+            layer_output_size = layer["output_dim"]
+            
+            params_values['W' + str(layer_idx)] += np.random.randn(layer_output_size, layer_input_size) * np.sqrt(dispersion_factor_within/(layer_input_size + layer_output_size)) 
+            params_values['b' + str(layer_idx)] += np.random.randn(layer_output_size, 1) * np.sqrt(dispersion_factor_within/(layer_input_size + layer_output_size)) 
+
     return params_values
 
 
@@ -81,34 +91,50 @@ def full_forward_propagation(X, params_values, nn_architecture):
     return A_curr, memory
 
 
-def get_cost_value(Y_hat, Y, type = 'binary_cross_entropy'):
-    
-    if type == 'binary_cross_entropy':
-        m = Y_hat.shape[1]
-        cost = -1 / m * (np.dot(Y, np.log(Y_hat).T) + np.dot(1 - Y, np.log(1 - Y_hat).T))
-    elif type == 'logistic_cross_entropy':
-        cost = log_loss(np.transpose(Y),np.transpose(Y_hat))
-    elif type == 'error_binary_classification':
-        cost = 1.0-(Y_hat == Y).mean()
+def get_cost_func(type):
+
+    #https://scikit-learn.org/stable/modules/model_evaluation.html#log-loss -> unify cross_entropy_binary and cross_entropy_softmax    
+    if type == 'cross_entropy_binary':
+        cost_function = lambda Y_hat, Y:  np.squeeze( (-1 / Y_hat.shape[1]) * (np.dot(Y, np.log(Y_hat).T) + np.dot(1 - Y, np.log(1 - Y_hat).T)) )
+
+    elif type == 'cross_entropy_softmax':
+        cost_function = lambda Y_hat, Y:  np.squeeze( log_loss(np.transpose(Y),np.transpose(Y_hat)))
+
+    elif type == 'error_classification':
+        cost_function = lambda Y_hat, Y:  1.0 - np.mean(Y_hat == Y)  
+
     elif type == "rmse":    
-        cost =  np.mean( (Y - Y_hat)**2)      
+        cost_function = lambda Y_hat, Y:  np.mean( (Y-Y_hat)**2)      
+   
     else:
-        raise Exception('No Cost type found')
+        raise Exception('No cost type found')
 
-    return np.squeeze(cost)
+    return cost_function
+
+def get_cost_func_deriv(type):
+    
+    if type == 'cross_entropy_binary':
+        cost_function_deriv = lambda Y_hat, Y:  - (np.divide(Y, Y_hat) - np.divide(1 - Y, 1 - Y_hat))
+
+    elif type == "rmse":    
+        cost_function_deriv = lambda Y_hat, Y:  2 * (Y_hat - Y)      
+  
+    else:
+        raise Exception('No cost type derivative found ')
+
+    return cost_function_deriv
 
 
-def get_accuracy_value(Y_hat, Y, type = 'binary_accuracy'):
+def get_accuracy_value(Y_hat, Y, type):
 
-    if type == 'binary_accuracy':
-        acc = (Y_hat == Y).mean()    
-    elif type == 'logistic_accuracy':
+    if type == 'binary_accuracy': # intended for the output of step functions
+        acc = (Y_hat == Y).mean()
+    elif type == 'sigmoid_accuracy': # intended for the output of one sigmoid function 
         Y_hat_ = convert_prob_into_class(Y_hat)
-        acc = (Y_hat_ == Y).all(axis=0).mean()
-    elif type == 'sigmoid_accuracy':
-        Y_hat_ = convert_prob_into_class(Y_hat)
-        acc = (Y_hat_ == Y).all(axis=1).mean()
-    elif type == 'f1_score':
+        acc = (Y_hat_ == Y).all(axis=1).mean()   
+    elif type == 'accuracy_multiclass':  #intended for one hot classification the output of softmax or vector sigmoid
+        acc = (np.argmax(Y_hat,1).astype('int32') == np.argmax(Y,1).astype('int32')).mean()
+    elif type == 'f1_score':  #intended for one hot classification the output of softmax or vector sigmoid
         acc = f1_score(np.argmax(Y_hat, 1).astype('int32'), np.argmax(Y, 1).astype('int32'), average='macro')
     elif type == "rmse":
         acc =  np.mean( (Y - Y_hat)**2)   
@@ -118,7 +144,7 @@ def get_accuracy_value(Y_hat, Y, type = 'binary_accuracy'):
     return acc
 
 
-def single_layer_backward_propagation(dA_curr, W_curr, b_curr, Z_curr, A_prev, activation="relu"):
+def single_layer_backward_propagation(dA_curr, W_curr, b_curr, Z_curr, A_prev, activation):
     # number of examples
     m = A_prev.shape[1]
     
@@ -128,7 +154,7 @@ def single_layer_backward_propagation(dA_curr, W_curr, b_curr, Z_curr, A_prev, a
     elif activation is "sigmoid":
         backward_activation_func = sigmoid_backward
     else:
-        raise Exception('Non-supported activation function')
+        raise Exception('Non-supported activation function for backward propagation')
     
     # calculation of the activation function derivative
     dZ_curr = backward_activation_func(dA_curr, Z_curr)
@@ -144,7 +170,7 @@ def single_layer_backward_propagation(dA_curr, W_curr, b_curr, Z_curr, A_prev, a
 
 
 
-def full_backward_propagation(Y_hat, Y, memory, params_values, nn_architecture):
+def full_backward_propagation(Y_hat, Y, memory, params_values, nn_architecture, cost_function_deriv):
     grads_values = {}
     
     # number of examples
@@ -153,8 +179,8 @@ def full_backward_propagation(Y_hat, Y, memory, params_values, nn_architecture):
     Y = Y.reshape(Y_hat.shape)
     
     # initiation of gradient descent algorithm
-    dA_prev = - (np.divide(Y, Y_hat) - np.divide(1 - Y, 1 - Y_hat));
-    
+    dA_prev = cost_function_deriv(Y_hat, Y)
+
     for layer_idx_prev, layer in reversed(list(enumerate(nn_architecture))):
         # we number network layers from 1
         layer_idx_curr = layer_idx_prev + 1
@@ -206,3 +232,4 @@ def relu_backward(dA, Z):
     dZ = np.array(dA, copy = True)
     dZ[Z <= 0] = 0;
     return dZ
+

@@ -1,0 +1,2 @@
+name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
+Xin-She Yang N. 4 Function,200,9.995227120702097e-05,swarm_derivfree,447600,3.03974960000005,3.046875,100000,0.0001,0.01,0.1,0,1,0,1

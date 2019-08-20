@@ -1,0 +1,2 @@
+name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
+f(x) = x^2 - (cos(4 Pi x) -1),50,0.0011788814288191654,swarm_derivfree,100000,1.4231638999999632,1.4375,2000,0,0.01,0.01,0,1,0,1

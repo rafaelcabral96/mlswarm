@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
+Gramacy & Lee Function,50,9.99993519308479e-05,[0.54876],-8.689942603533318e-01,swarm_derivfree,7022,351100,1.7317377000000107,1.734375,100000,0.0001,0.001,0.01,0,10,0,10

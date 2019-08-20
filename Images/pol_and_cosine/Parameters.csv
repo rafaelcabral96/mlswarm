@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+pol_and_cosine,50,1.9144557143159846e-05,[-0.00083],5.564098021283885e-05,swarm_derivfree,5000,250000,10.425290099999998,10.421875,5000,1e-05,0.01,0.01,0,10,0,1,0

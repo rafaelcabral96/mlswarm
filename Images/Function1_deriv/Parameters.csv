@@ -1,0 +1,2 @@
+name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
+Function1,50,0.0012454674053975258,swarm_derivfree,100000,0.5502785000000001,0.546875,2000,0,0.01,0.01,0,1,0,10
