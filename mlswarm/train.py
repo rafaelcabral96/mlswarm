@@ -1,28 +1,162 @@
 import numpy as np
 from mlswarm.neural_networks import init_layers, full_forward_propagation, full_backward_propagation, get_cost_func, get_cost_func_deriv, get_accuracy_value
-from mlswarm.utils import timerfunc, get_mean, get_var
-from mlswarm.optimizers import update_nn_gd, update_nn_weights, update_nn_weights_derivative_free, update_nn_gd_nesterov, update_nn_weights_nesterov, update_nn_weights_derivative_free_nesterov
-
+from mlswarm.utils import timerfunc, get_mean, get_var, gradient, gradS, flatten_weights, flatten_weights_gradients, unflatten_weights
+from mlswarm.optimizers import  update_cloud_derivative_free, update_cloud, nesterov, adaptive_step_size, update_nn_weights_derivative_free
 
 
 @timerfunc
-def train_nn(self, X, Y, cloud, nn_architecture, method, max_epochs, n_batches,  batch_size, learning_rate, 
-          cost_type, N, kernel_a, alpha_init, alpha_rate, beta, gamma, verbose, var_epsilon):
-    
-    #check if backprogation is required
-    gradient_required = (method in ["gradient_descent","gradient_descent_nesterov", "swarm", "swarm_nesterov"])
+def f_minimize(self, max_iterations, epsilon, var_epsilon, lr, method, N_sample, kernel_a, alpha_init, alpha_rate, beta, gamma_init, gamma_rate, verbose, track_history):
+  
+    #checking if it is necessary to compute gradients
+    gradient_required = self.train_method in ["gradient_descent","gradient"]
 
-    #define necessary history variables for nesterov method
-    if "nesterov" in method:
-        lamb = 0
-        yf = 0
+    #define necessary history variables for nesterov method and euler adaptive
+    lamb = 0
+    yf = 0
+    update = 0
+
+    #compute several initial values
+    self.function_values = self.func(self.cloud.T)
+    self.cloud_mean_func = self.func(self.cloud_mean)
+    self.elapsed_iterations = 0  
+    gamma = gamma_init  
+    alpha = alpha_init
+    init_var = self.cloud_var
+
+
+    #start cloud update cycle
+    for i in range(max_iterations):
+        
+        update_old = update
+
+        #rescale gamma term
+        gamma = gamma * np.mean(self.cloud_var)
+
+        #compute update and cloud variance-------------------------------
+        if method == 'gradient':
+            gradients = gradient(self.func, self.cloud.T).T
+            update, cloud_var = update_cloud(self.cloud, gradients, lr, self.N, kernel_a, alpha, beta, gamma) 
+        
+        elif method == 'gradient_descent': 
+            update = gradient(self.func, self.cloud.T).T
+            cloud_var = 100
+
+        elif method == 'gradient_free':
+            update, cloud_var = update_cloud_derivative_free(self,  self.cloud, self.function_values, lr, self.N, kernel_a, alpha, beta, gamma)  
+
+        else:
+            raise Exception("No method found")
+
+
+       #update cloud based on chosen algorithm---------------------------
+        if self.algorithm == 'euler':
+            self.cloud -= lr * update
+
+        elif self.algorithm == 'nesterov':
+            self.cloud, yf, lamb = nesterov(self.cloud, yf, lamb, self.elapsed_iterations, lr, update)
+
+        elif self.algorithm == 'euler_adaptive':
+            lr = adaptive_step_size(lr, i, update, update_old)
+            self.cloud -= lr * update
+
+        elif self.algorithm == 'nesterov_adaptive':
+            
+            if self.elapsed_iterations == 0:
+                lamb = np.ones(update.shape[0])
+                yf = self.cloud
+            else:
+                lamb = (1.0 + np.sqrt(1.0 + 4.0*lamb_prev**2))/2.0
+
+                #nesterov_restart
+                lamb[nesterov_restart] = 1
+                yf[np.repeat(nesterov_restart,update.shape[1]).reshape(update.shape)] = self.cloud[np.repeat(nesterov_restart,update.shape[1]).reshape(update.shape)]
+            
+                if self.elapsed_iterations % 100 == 0:
+                    lamb = np.ones(update.shape[0])
+                    yf = self.cloud
+
+            lamb_next = (1.0 + np.sqrt(1.0 + 4.0*lamb**2))/2.0
+
+            g_const = (1.0 - lamb) / lamb_next
+            yfnext = self.cloud - lr * update
+            self.cloud = np.einsum('i,ij -> ij',(1.0 - g_const),yfnext) + np.einsum('i,ij ->ij', g_const, yf)
+
+            yf = yfnext
+            lamb_prev = lamb
+
+            new_function_values = self.func(self.cloud.T)
+            nesterov_restart = new_function_values > self.function_values
+     
+        else:
+            raise Exception("Algorithm not found")
+        
+        #compute new cloud properties
+        self.function_values = self.func(self.cloud.T)
+        self.cloud_var = np.mean(get_var(self.cloud)) 
+        self.cloud_mean = np.mean(self.cloud, axis=0)
+        old_cloud_mean_func = self.cloud_mean_func
+        self.cloud_mean_func = self.func(self.cloud_mean)
+
+        #update best particle position, function value
+        new_min = np.nanmin(self.function_values) 
+        if new_min < self.best_value:
+            self.best_value = new_min + 0
+            self.best_position  = self.cloud[np.nanargmin(self.function_values)] + 0
+
+        #update alpha and elapsed_iterations
+        alpha += alpha_rate
+        gamma += gamma_rate
+        self.elapsed_iterations += 1
+
+        #appending results to history lists 
+        if track_history:  
+            self.cost_history.append(self.function_values + 0)
+            self.cloud_history.append(self.cloud.T + 0)
+            self.cost_history_mean.append(self.cloud_mean_func + 0) 
+            self.cloud_history_mean.append(self.cloud_mean + 0)
+            self.cloud_var_history.append(self.cloud_var + 0)
+            if "gradient_descent" not in method: self.gradS_history.append(gradS(self.cloud,kernel_a))
+
+        #print basic cloud information
+        if(verbose):
+            print("Iteration: {:05} -  Function value at cloud mean: {:.5f} - Cloud variance: {:.5f}".format(i, self.cloud_mean_func, self.cloud_var))
+
+        #check if terminal conditions are met
+        if (np.abs(old_cloud_mean_func - self.cloud_mean_func) < epsilon) & (i > 2):
+            print("Convergence achieved - Function value at cloud mean stabilized")
+            break
+
+        if self.cloud_var < var_epsilon: 
+            print("Convergence achieved - Particles are localized")
+            break
+
+        #check if cloud exploded
+        if self.cloud_var > 10000*init_var:
+            print("Failed convergence - Cloud variance too high")
+            break
+
+    if i == (max_iterations - 1): print("Maximum amount of iterations reached")
+        
+    self.function_evaluations = self.elapsed_iterations*self.N* (1 + 2 *int(gradient_required))
+
+
+@timerfunc
+def train_nn(self, X, Y,  method, max_epochs, n_batches,  batch_size, lr, 
+              cost_type, kernel_a, alpha_init, alpha_rate, beta, gamma_init, verbose, var_epsilon):
+
+    #check if backprogation is requireself, X, Y, method, algorithm, max_epochs, n_batches, batch_size, learning_rate, cost_type, kernel_a,  alpha_init, alpha_rate, beta, gamma, verbose, var_epsilond
+    gradient_required = (method in ["gradient_descent","gradient"])
+
+    #define necessary history variables for nesterov method and euler adaptive
+    lamb = 0
+    yf = 0
+    update = 0
 
     # initiation of lists storing the cost history 
-    cost_history = []
-    cost_history_mean = []
-    
     alpha = alpha_init
-    elapsed_iterations = 0   
+    gamma = gamma_init
+    self.elapsed_iterations = 0   
+    init_var = self.cloud_var
 
     #get cost function 
     cost_func = get_cost_func(cost_type)
@@ -34,9 +168,11 @@ def train_nn(self, X, Y, cloud, nn_architecture, method, max_epochs, n_batches, 
     print("\nTraining started...")   
 
     for i in range(max_epochs):
-        
+
         for batch in range(n_batches):
    
+            update_old = update
+
             start = batch*batch_size
             end = start + batch_size
 
@@ -46,10 +182,10 @@ def train_nn(self, X, Y, cloud, nn_architecture, method, max_epochs, n_batches, 
             grads = []
 
             #cycle all particles
-            for j in range(N):  
+            for j in range(self.N):  
 
                 # step forward
-                Y_hat_temp, cache_temp = full_forward_propagation(X[:,start:end], cloud[j], nn_architecture)
+                Y_hat_temp, cache_temp = full_forward_propagation(X[:,start:end], self.cloud[j], self.architecture)
                 Y_hat.append(Y_hat_temp)
                 cache.append(cache_temp)
                 
@@ -59,217 +195,121 @@ def train_nn(self, X, Y, cloud, nn_architecture, method, max_epochs, n_batches, 
 
                 # step backward - calculating gradient
                 if gradient_required:
-                    gradsj =  full_backward_propagation(Y_hat[j], Y[:,start:end], cache[j], cloud[j], nn_architecture, cost_func_deriv)
+                    gradsj =  full_backward_propagation(Y_hat[j], Y[:,start:end], cache[j], self.cloud[j], self.architecture, cost_func_deriv)
                     grads.append(gradsj)  
            
-            if method == "swarm":                        cloud, cloud_var = update_nn_weights(cloud, grads, learning_rate, N, kernel_a, alpha, beta, gamma)
-            elif method == "swarm_derivfree":            cloud, cloud_var = update_nn_weights_derivative_free(cloud, costs, learning_rate, N, kernel_a, alpha, beta, gamma)
-            elif method == "gradient_descent":           cloud, cloud_var = update_nn_gd(cloud[0], grads[0], nn_architecture, learning_rate)
-            elif method == "swarm_nesterov":             cloud, yf, lamb, cloud_var = update_nn_weights_nesterov(cloud, yf, lamb, elapsed_iterations, grads, learning_rate, N, kernel_a, alpha, beta, gamma)
-            elif method == "swarm_derivfree_nesterov":   cloud, yf, lamb, cloud_var = update_nn_weights_derivative_free_nesterov(cloud, yf, lamb, elapsed_iterations, costs, learning_rate, N, kernel_a, alpha, beta, gamma)
-            #elif method == "gradient_descent_nesterov":  cloud, yf, lamb, cloud_var = update_nn_gd_nesterov(cloud[0], yf, lamb, elapsed_iterations, grads[0], nn_architecture, learning_rate)
-            else: raise Exception("No method found")
+            costs = np.squeeze(np.array(costs))
 
-            #end of iteration       
-            cost_history.append(costs)
+            #update best neural_network, cost
+            new_min = np.nanmin(costs) 
+            if new_min < self.best_cost:
+                self.best_cost = new_min
+                self.best_nn = self.cloud[np.nanargmin(costs)]
 
-            #mean particle position and its cost
-            cloud_mean = get_mean(cloud)
-            Y_hat_mean, _ = full_forward_propagation(X[:,start:end], cloud_mean, nn_architecture)
-            cost_mean = cost_func(Y_hat_mean, Y[:,start:end])
-            cost_history_mean.append(cost_mean)
+            #compute update and cloud variance--------------------------------------
+            if method == 'gradient':
+                cloudf, gradientsf, nn_shape, weight_names = flatten_weights_gradients(self.cloud, grads, self.N)
+                update, var = update_cloud(cloudf, gradientsf, lr, N, kernel_a, alpha, beta, gamma) 
 
-            elapsed_iterations += 1
+            elif method == 'gradient_descent':
+                cloudf, update, nn_shape, weight_names = flatten_weights_gradients(self.cloud, grads, self.N)
+                var = 0
 
+            elif method == 'gradient_free':
+                cloudf, nn_shape, weight_names = flatten_weights(self.cloud, self.N)
+                update, var = update_cloud_derivative_free(cloudf, costs, lr, self.N, kernel_a, alpha, beta, gamma)
+
+            else:
+                raise Exception("Train method not found")
+
+
+           #update cloud based on chosen algorithm---------------------------
+            if self.algorithm == 'euler':
+                cloudf -= lr * update
+            
+            elif self.algorithm == 'nesterov':
+                cloudf, yf, lamb = nesterov(cloudf, yf, lamb, elapsed_iterations, lr, update)
+            
+            elif self.algorithm == 'euler_adaptive':
+                theta = 0.2
+                lr_old = lr
+                if i == 0:
+                    lr = lr_old
+                else:
+                    lr = 2 * lr_old * theta * np.sum(np.abs(update))/np.sum(np.abs((update - update_old)))
+                    lr = np.min((lr,1))
+                    lr = np.max((lr,0.00001))
+                cloudf -= lr * update
+            
+            elif self.algorithm == 'nesterov_adaptive':
+
+                if self.elapsed_iterations == 0:
+                    lamb = np.ones(update.shape[0])
+                    yf = self.cloud
+                else:
+                    lamb = (1.0 + np.sqrt(1.0 + 4.0*lamb_prev**2))/2.0
+
+                    #nesterov_restart
+                    lamb[nesterov_restart] = 1
+                    yf[np.repeat(nesterov_restart,update.shape[1]).reshape(update.shape)] = self.cloud[np.repeat(nesterov_restart,update.shape[1]).reshape(update.shape)]
+                
+                    if self.elapsed_iterations % 100 == 0:
+                        lamb = np.ones(update.shape[0])
+                        yf = self.cloud
+
+                lamb_next = (1.0 + np.sqrt(1.0 + 4.0*lamb**2))/2.0
+
+                g_const = (1.0 - lamb) / lamb_next
+                yfnext = self.cloud - lr * update
+                self.cloud = np.einsum('i,ij -> ij',(1.0 - g_const),yfnext) + np.einsum('i,ij ->ij', g_const, yf)
+
+                yf = yfnext
+                lamb_prev = lamb
+
+                new_function_values = self.func(self.cloud.T)
+                nesterov_restart = new_function_values > self.function_values
+
+            else:
+                raise Exception("No algorithm found")
+
+            #restore NN weight shapes 
+            self.cloud = unflatten_weights(cloudf,nn_shape,weight_names,self.N)
+
+            self.elapsed_iterations += 1
 
         #end of epoch----------------
-        cloud_var = np.mean(get_var(cloud_var)) #mean of variances along dimensions of parameter space
+        self.cloud_mean = get_mean(self.cloud)
+        self.cloud_var = np.mean(var)
+        self.cost_history.append(costs)
+        self.cloud_var_history.append(self.cloud_var)
 
-        if(verbose):
-            print("Iteration: {:05} - Cloud mean cost: {:.5f} - Cloud variance: {:.5f}".format(i, cost_mean, cloud_var))
+        Y_hat_mean, _ = full_forward_propagation(X[:,start:end], self.cloud_mean, self.architecture)
+        cost_mean = cost_func(Y_hat_mean, Y[:,start:end])
+        self.cost_history_mean.append(cost_mean)
 
         alpha += alpha_rate
+        gamma = gamma * np.mean(self.cloud_var)
 
-        if cloud_var < var_epsilon: 
+        #print basic cloud information
+        if(verbose):
+            print("Iteration: {:05} - Cloud mean cost: {:.5f} - Cloud variance: {:.5f}".format(i, cost_mean, self.cloud_var))
+
+        #check if terminal conditions are met
+        if self.cloud_var < var_epsilon: 
             print("Convergence achieved - particles are localized")
+            break
+
+        #check if cloud exploded
+        if self.cloud_var > 10000*init_var:
+            print("Failed convergence - Cloud variance too high")
             break
 
     if i == (max_epochs - 1): print("Maximum amount of epochs reached")
 
     print("\nCost function value at cloud mean: " + str(cost_mean))
-    print("Cost function value (derivative) evaluated {:01} ({:01}) times".format(int(elapsed_iterations*N),int(gradient_required)*elapsed_iterations*N))
-
-    return cloud, cloud_mean, cloud_var, cost_history, cost_history_mean
-
-
-
-@timerfunc
-def train_fmin2(self, max_iterations, var_epsilon, learning_rate, method, N_sample, kernel_a, alpha_init, alpha_rate, beta, gamma_init, gamma_rate, verbose, track_history):
-
-    from mlswarm.optimizers import update_swarm_func, update_swarm_derivative_free_func, update_gd_func, update_swarm_func_nesterov, update_swarm_derivative_free_func_nesterov, update_gd_func_nesterov
-    from mlswarm.utils import gradient, gradS
-  
-    #cheching if it is necessary to compute gradients
-    gradient_required = (method in ["gradient_descent","gradient_descent_nesterov", "swarm", "swarm_nesterov"]) #or time_step_control
-
-    #define necessary history variables for nesterov method
-    if "nesterov" in method:
-        lamb = 0
-        yf = 0
-
-    #init of history lists
-    if track_history:
-        self.cost_history = []
-        self.cost_history_mean = []
-        self.cloud_history = []
-        self.cloud_history_mean = []
-        self.cloud_var_history = []
-        self.gradS_history = []
-
-    #compute necessary values
-    alpha = alpha_init
-    gamma = gamma_init
-    self.elapsed_iterations = 0    
-    self.function_values = self.func(self.cloud.T)
-
-    updates = []
-    for i in range(max_iterations):
-        
-        #compute gradients
-        if gradient_required:
-            gradients = gradient(self.func, self.cloud.T).T
-
-        #update cloud
-        #for learning_rate in [1,0.1,0.01,0.001]:        
-        if method == "swarm":                       cloud_temp, update = update_swarm_func(self.cloud + 0.0, gradients, learning_rate, self.N, kernel_a, alpha, beta, gamma)
-        elif method == "swarm_derivfree":           cloud_temp, update = update_swarm_derivative_free_func(self.cloud + 0.0, self.function_values + 0.0, learning_rate, self.N, kernel_a, alpha, beta, gamma, N_sample)
-        elif method == "gradient_descent":          cloud_temp, update = update_gd_func(self.cloud + 0.0, gradients, learning_rate)
-            #elif method == "swarm_nesterov":            cloud, yf, lamb, cloud_var = update_swarm_func_nesterov(cloud, yf, lamb, elapsed_iterations, gradients, learning_rate, N, kernel_a, alpha, beta, gamma)
-            #elif method == "swarm_derivfree_nesterov":  cloud, yf, lamb, cloud_var = update_swarm_derivative_free_func_nesterov(cloud, yf, lamb, elapsed_iterations, function_values, learning_rate, N, kernel_a, alpha, beta, gamma)
-            #elif method == "gradient_descent_nesterov": cloud, yf, lamb, cloud_var = update_gd_func_nesterov(cloud, yf, lamb, elapsed_iterations, gradients, learning_rate)
-        else: raise Exception("No method found")
-            
-         #   if (np.mean(self.func(cloud_temp.T)) - np.mean(self.function_values)) < (-learning_rate* np.mean(np.power(np.abs(update),1)) / 2.0 ):
-         #       self.cloud = cloud_temp
-         #       break           
-
-        updates.append(update) # t x N x N_variables
-        self.cloud = cloud_temp - np.divide(learning_rate,1 + np.sqrt(np.sum(np.array(updates)**2, axis=0)))*update
-        #print(np.divide(1,np.sqrt(np.sum(np.array(updates)**2, axis=0))))
-        #if learning_rate == 0.001:
-        #    self.cloud = cloud_temp
-
-        #compute cloud properties
-        self.function_values = self.func(self.cloud.T)
-        self.cloud_var = np.mean(get_var(self.cloud))
-        self.cloud_mean = np.mean(self.cloud, axis=0)
-        self.cloud_mean_func = self.func(self.cloud_mean)
-
-        #update alpha and elapsed_iterations
-        alpha = alpha + alpha_rate
-        gamma = gamma + gamma_rate
-        self.elapsed_iterations += 1
-
-        #appending results to history lists
-        if track_history:  
-            self.cost_history.append(self.function_values)
-            self.cost_history_mean.append(self.cloud_mean_func) 
-            self.cloud_history.append(self.cloud.T + 0)
-            self.cloud_history_mean.append(self.cloud_mean)
-            self.cloud_var_history.append(self.cloud_var)
-            if "gradient_descent" not in method: self.gradS_history.append(gradS(self.cloud,kernel_a))
-
-        if(verbose):
-            print("Iteration: {:05} -  Function value at cloud mean: {:.5f} - Cloud variance: {:.5f}".format(i, self.cloud_mean_func, self.cloud_var))
-
-        if self.cloud_var < var_epsilon: 
-            print("Convergence achieved - Particles are localized")
-            break
-
-    if i == (max_iterations - 1): print("Maximum amount of iterations reached")
-        
-    self.function_evaluations = self.elapsed_iterations*self.N* (1+ 2 *int(gradient_required))
-    print("\nFunction value at cloud mean: " + str(self.cloud_mean_func))
-    print("Function value evaluated {:01} times".format(self.function_evaluations))
+    print("Best cost was: " + str(self.best_cost))
+    print("Cost function value (derivative) evaluated {:01} ({:01}) times".format(int(self.elapsed_iterations*self.N),int(gradient_required)*self.elapsed_iterations*self.N))
 
 
 
 
-
-@timerfunc
-def train_fmin(self, max_iterations, var_epsilon, learning_rate, method, N_sample, kernel_a, alpha_init, alpha_rate, beta, gamma_init, gamma_rate, verbose, track_history):
-
-    from mlswarm.optimizers import update_swarm_func, update_swarm_derivative_free_func, update_gd_func, update_swarm_func_nesterov, update_swarm_derivative_free_func_nesterov, update_gd_func_nesterov
-    from mlswarm.utils import gradient, gradS
-  
-    #cheching if it is necessary to compute gradients
-    gradient_required = (method in ["gradient_descent","gradient_descent_nesterov", "swarm", "swarm_nesterov"]) #or time_step_control
-
-    #define necessary history variables for nesterov method
-    if "nesterov" in method:
-        lamb = 0
-        yf = 0
-
-    #init of history lists
-    if track_history:
-        self.cost_history = []
-        self.cost_history_mean = []
-        self.cloud_history = []
-        self.cloud_history_mean = []
-        self.cloud_var_history = []
-        self.gradS_history = []
-
-    #compute necessary values
-    self.elapsed_iterations = 0  
-    gamma = gamma_init  
-    alpha = alpha_init
-    self.function_values = self.func(self.cloud.T)
-
-    for i in range(max_iterations):
-        
-        #compute gradients
-        if gradient_required:
-            gradients = gradient(self.func, self.cloud.T).T
-
-        #update cloud
-        if method == "swarm":                       self.cloud, _ = update_swarm_func(self.cloud, gradients, learning_rate, self.N, kernel_a, alpha, beta, gamma)
-        elif method == "swarm_derivfree":           self.cloud, _ = update_swarm_derivative_free_func(self.cloud, self.function_values, learning_rate, self.N, kernel_a, alpha, beta, gamma, N_sample)
-        elif method == "gradient_descent":          self.cloud, _ = update_gd_func(self.cloud, gradients, learning_rate)
-        #elif method == "swarm_nesterov":            cloud, yf, lamb, cloud_var = update_swarm_func_nesterov(cloud, yf, lamb, elapsed_iterations, gradients, learning_rate, N, kernel_a, alpha, beta, gamma)
-        #elif method == "swarm_derivfree_nesterov":  cloud, yf, lamb, cloud_var = update_swarm_derivative_free_func_nesterov(cloud, yf, lamb, elapsed_iterations, function_values, learning_rate, N, kernel_a, alpha, beta, gamma)
-        #elif method == "gradient_descent_nesterov": cloud, yf, lamb, cloud_var = update_gd_func_nesterov(cloud, yf, lamb, elapsed_iterations, gradients, learning_rate)
-        else: raise Exception("No method found")
-            
-
-        #compute cloud properties
-        self.function_values = self.func(self.cloud.T)
-        self.cloud_var = np.mean(get_var(self.cloud))
-        self.cloud_mean = np.mean(self.cloud, axis=0)
-        self.cloud_mean_func = self.func(self.cloud_mean)
-
-        #update alpha and elapsed_iterations
-        alpha += alpha_rate
-        gamma += gamma_rate
-        self.elapsed_iterations += 1
-
-        #appending results to history lists
-        if track_history:  
-            self.cost_history.append(self.function_values + 0)
-            self.cost_history_mean.append(self.cloud_mean_func + 0) 
-            self.cloud_history.append(self.cloud.T + 0)
-            self.cloud_history_mean.append(self.cloud_mean + 0)
-            self.cloud_var_history.append(self.cloud_var + 0)
-            if "gradient_descent" not in method: self.gradS_history.append(gradS(self.cloud,kernel_a))
-
-        if(verbose):
-            print("Iteration: {:05} -  Function value at cloud mean: {:.5f} - Cloud variance: {:.5f}".format(i, self.cloud_mean_func, self.cloud_var))
-
-        if self.cloud_var < var_epsilon: 
-            print("Convergence achieved - Particles are localized")
-            break
-
-    if i == (max_iterations - 1): print("Maximum amount of iterations reached")
-        
-    self.function_evaluations = self.elapsed_iterations*self.N* (1 + 2 *int(gradient_required))
-    print("\nFunction value at cloud mean: " + str(self.cloud_mean_func))
-    print("Function value evaluated {:01} times".format(self.function_evaluations))

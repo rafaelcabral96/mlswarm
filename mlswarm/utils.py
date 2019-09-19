@@ -1,12 +1,10 @@
 import numpy as np
-import time 
-import os
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-#from scipy import stats
 import scipy.integrate as integrate
-import pandas 
+import time 
+#from scipy import stats
 
+
+#UTIL FUNCTIONS FOR BOTH CLASSES------------------------------------------------------
 
 def timerfunc(func):
     #timer decorator
@@ -31,6 +29,34 @@ def timerfunc(func):
         return value
     return function_timer
 
+def get_var(cloud, cloud_mean = 0):
+     return np.sum( (cloud - cloud_mean)**2, axis=0)/cloud.shape[0] #use biased version
+
+
+def gradient(func, x, h = None):
+    if h is None:
+        h = 1e-08
+    xph = x + h
+    dx = xph - x
+    return (func(xph) - func(x)) / dx
+
+
+def gradS(cloud,kernel_a):
+    cloud_mean = np.mean(cloud, axis=0)
+    cloud_var = get_var(cloud) #np.var(cloudf, axis=0) works best
+
+    params_diff_matrix = cloud[:,np.newaxis] - cloud    
+    #compute kernels
+    norm = np.sum(params_diff_matrix**2, axis= 2) 
+    kernels = np.exp(-kernel_a*norm)
+    gkernels = -2*kernel_a*np.einsum('ijk,ij -> ijk',params_diff_matrix,kernels)
+
+    gradS = np.einsum('ij,jk -> ik', kernels, (cloud - cloud_mean)/cloud_var) + np.einsum('ijk ->ik',gkernels)
+    gradS = np.sqrt(np.sum(gradS**2))
+
+    return gradS
+
+##UTILS FUNCTIONS FOR NEURALNET CLASS---------------------------------------------------------
 
 def flatten_weights(cloud,N):
     tensor_names = list(cloud[0].keys())
@@ -95,23 +121,11 @@ def kernel_a_finder(cloudf, N):
     norm = np.sum(cloud_diff_matrix**2, axis=2) 
     kernel_a_pool = [0.00001, 0.0005, 0.0001, 0.0005,0.001,0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 20, 50, 100]
     for kernel_a in kernel_a_pool:
-        if(np.mean(np.einsum('ij -> i',np.exp(-kernel_a*norm))/N)) < 1:
+        if(np.mean(np.einsum('ij -> i',np.exp(-kernel_a*norm))/N)) < 0.75:
             break
 
     print("Kernel constant found: " + str(kernel_a))
     return kernel_a
-
-def gradient(func, x, h = None):
-    if h is None:
-        # Note the hard coded value found here is the square root of the
-        # floating point precision, which can be found from the function
-        # call np.sqrt(np.finfo(float).eps).
-        h = 1e-08
-    xph = x + h
-    dx = xph - x
-    return (func(xph) - func(x)) / dx
-
-#def gradient_costfunction(cost)
 
 def convert_prob_into_class(probs):
     probs_ = np.copy(probs)
@@ -125,35 +139,63 @@ def get_mean(cloud):
         params_mean[key] = np.mean([cloud[j][key] for j in range(len(cloud))],axis=0)
     return params_mean
 
-def get_var(cloud, cloud_mean = 0):
-     return np.var(cloud,axis=0)
-     #return np.mean((cloud-cloud_mean)**2)
 
-#def normal_test(cloudf):
-#    k, _ = stats.normaltest( (cloudf- np.mean(cloudf,axis=0))/np.var(cloudf,axis=0) , axis = 0)
-#    print(np.mean(k))
-#    print("Normality test p-value - percentage of particles rejected: "  + str(1 - np.mean(np.greater(p,0.05))))
 
-def gradS(cloud,kernel_a):
-    cloud_mean = np.mean(cloud, axis=0)
-    cloud_var = get_var(cloud) #np.var(cloudf, axis=0) works best
+#UTIL FUNCTIONS FOR FUNCTION CLASS -------------------------------------------------------------
 
-    params_diff_matrix = cloud[:,np.newaxis] - cloud    
-    #compute kernels
-    norm = np.sum(params_diff_matrix**2, axis= 2) 
-    kernels = np.exp(-kernel_a*norm)
-    gkernels = -2*kernel_a*np.einsum('ijk,ij -> ijk',params_diff_matrix,kernels)
+def get_parameters_nn(self, X, Y, d):
 
-    gradS = np.einsum('ij,jk -> ik', kernels, (cloud - cloud_mean)/cloud_var) + np.einsum('ijk ->ik',gkernels)
-    gradS = np.sqrt(np.sum(gradS**2))
+    method = d.get('method', 'gradient_free')
+    algorithm = d.get('algorithm', 'euler')
+    max_epochs =  d.get('max_epochs', 500)
+    n_batches = d.get('n_batches', 1)
+    batch_size = d.get('batch_size', X.shape[0])
+    learning_rate = d.get('learning_rate', 0.01)
+    cost_type = d.get('cost_type','rmse')
+    kernel_a = d.get('kernel_a', 1)
+    alpha_init = d.get('alpha_init', 0)
+    alpha_rate = d.get('alpha_rate', 1)
+    beta = d.get('beta', 0)
+    gamma = d.get('gamma', 0)
+    verbose = d.get('verbose', False)
+    var_epsilon = d.get('var_epsilon',0)
 
-    return gradS
+    self.train_method = method
+    self.algorithm = algorithm
 
+    #transposing input and output data
+    X = X.T
+    Y = Y.T
+
+    return [self, X, Y, method, max_epochs, n_batches, batch_size, learning_rate, cost_type, kernel_a,  alpha_init, alpha_rate, beta, gamma, verbose, var_epsilon]
+
+def get_parameters(self, d):
+    max_iterations =  d.get('max_iterations', 10000)
+    epsilon = d.get('epsilon', 0) 
+    var_epsilon = d.get('var_epsilon',0.0001)
+    learning_rate = d.get('learning_rate', 0.01)
+    method = d.get('method', 'gradient_free')
+    algorithm = d.get('algorithm', 'euler_adaptive')
+    restart_cloud = d.get('restart_cloud', False)
+    kernel_a = d.get('kernel_a', 1)
+    alpha_init = d.get('alpha_init', 0)
+    alpha_rate = d.get('alpha_rate', 1)
+    beta = d.get('beta', 0)
+    gamma_init = d.get('gamma_init', 0)
+    gamma_rate = d.get('gamma_init', 0)
+    verbose = d.get('verbose', False)
+    track_history = d.get('track_history', True)
+
+    self.train_method = method
+    self.algorithm = algorithm
+    self.train_parameters = [max_iterations, epsilon, var_epsilon, learning_rate, kernel_a, alpha_init, alpha_rate, beta, gamma_init, gamma_rate]
+
+    return [self, max_iterations, epsilon, var_epsilon, learning_rate, method, restart_cloud, kernel_a, alpha_init, alpha_rate, beta, gamma_init, gamma_rate, verbose, track_history]
 
 def gaussian(x, mu, var):
     return np.exp(-np.power(x - mu, 2.) / (2 * var))/(np.sqrt(2*np.pi*var))
 
-def integral_on_gaussian_measure_util(self):
+def get_integral_on_gaussian_measure(self):
     integral_history = []
     for mean, var in zip(self.cloud_history_mean,self.cloud_var_history):
         integrant = lambda x, mean, var: self.func([x]) * gaussian(x,mean,var) 
@@ -162,163 +204,15 @@ def integral_on_gaussian_measure_util(self):
     return integral_history
 
 
+def get_all_parameters_util(self,save = False, file_name = ""):
 
-#PLOTS-----------------------------------------------
-
-def plot_distance_matrix(cloud, N):
-    n_params = len(cloud[0])
-    tensor_names = list(cloud[0].keys())
-
-    #flatten all tensors
-    cloudf = []
-    for nn in range(N):
-        flatten = np.ndarray.flatten(cloud[nn][tensor_names[0]])
-        for param in range(n_params):
-            flatten_temp = np.ndarray.flatten(cloud[nn][tensor_names[param]])
-            flatten = np.concatenate((flatten,flatten_temp),axis=None)
-        cloudf.append(flatten)    
-        
-    plot_matrix = [[norm2(cloudf[i],cloudf[j]) for j in range(N)] for i in range(N)] 
-    plt.imshow(np.asarray(plot_matrix))
-    plt.title("Distance between NN")
-    plt.colorbar()
-
-    plt.show()
-    plt.close()
-
-def plot_list(history, title, xlabel, ylabel, save, file_name, log = False):
-    plt.figure()
-    plt.plot(history)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    if log:
-        plt.yscale('log')
-    plt.title(title)
+    header = ["name", "N", "cloud_var", "cloud_mean" , "cloud_mean_func" ,"train_method", "train_algorithm", "elapsed_iterations", "function_evaluations", "clock_time", "cpu_time", "max_iterations", "epsilon", "var_epsilon", "learning_rate", "kernel_a", "alpha_init", "alpha_rate", "beta", "gamma", "gamma_rate"]
+    data = [self.name, self.N, self.cloud_var,np.array2string(self.cloud_mean, precision = 5), np.format_float_scientific(self.cloud_mean_func.flatten()) ,self.train_method, self.algorithm, self.elapsed_iterations, self.function_evaluations, self.clock_time, self.cpu_time]
+    data = data + self.train_parameters
 
     if save:
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        plt.savefig('Images/' + file_name, dpi = 300)
-
-    plt.show()
-    plt.close()
-
-def plot_matrix(history, history_mean, title, xlabel, ylabel, legend, save, file_name, log = False):
-
-    df = pandas.DataFrame(history)
-    df=df.astype(float)
-
-    plt.figure()
-    if log:
-        plt.yscale('log')
-    for particle in range(len(df.columns)):
-        plt.plot(df.iloc[:,particle], lw = 0.2)
-
-    plt.plot(history_mean, 'k-',lw= 2)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title)
-
-    plt.legend([Line2D([0], [0], color = 'black', lw= 2)],[legend])
-
-    if save:
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        plt.savefig('Images/' + file_name, dpi = 300)
-
-    plt.show()
-    plt.close()
-
-def plot_2D_trajectory(cloud_history_mean, N, save, file_name, limits, cloud_history = None, X = None, Y = None, z = None, log = False):
-
-
-    plt.figure()
-    plt.contourf(X, Y, z, cmap=plt.get_cmap("bwr"))
-
-    if cloud_history is not None:
-        for i in range(N):
-            cloud_history_x = [cloud_history[itera][0][i] for itera in range(len(cloud_history))]
-            cloud_history_y = [cloud_history[itera][1][i] for itera in range(len(cloud_history))]
-            plt.plot(cloud_history_x, cloud_history_y, '-', lw = 0.3)
-            plt.plot(cloud_history_x[0], cloud_history_y[0], 'bo', markersize = 0.5) 
-    
-    plt.xlim(limits[0],limits[1])
-    plt.ylim(limits[2],limits[3])
-    plt.xlabel("x")
-    plt.ylabel("y")
-    if log:
-        plt.xscale('log')
-        plt.yscale('log')
-    plt.legend([Line2D([0], [0], marker = 'o', markersize=10, color = 'black')],['Cloud mean'])
-    plt.axvline(x=0, color='k', linestyle='--', lw = 1)
-    plt.axhline(y=0, color='k', linestyle='--', lw = 1)
-    plt.title(r'Particle positions  $ x_i (t)$')
-    
-    cloud_history_mean_x = [it[0] for it in cloud_history_mean]                
-    cloud_history_mean_y = [it[1] for it in cloud_history_mean]   
-    plt.plot(cloud_history_mean_x, cloud_history_mean_y, 'k-', lw = 2)
-    plt.plot(cloud_history_mean_x[0], cloud_history_mean_y[0], 'ko')
-    plt.colorbar()
-
-    if save:
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        plt.savefig('Images/' + file_name, dpi = 300)
-
-    plt.show()
-    plt.close()
-
-def plot_xy(x, fx, title, xlabel, ylabel, legend, log, save, file_name):
-    fig = plt.figure()
-    if log:
-        plt.yscale('log')
-    ax = plt.subplot(111)
-    for f in fx:   
-        ax.plot(x,f)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-
-    if legend is not None: 
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-        ax.legend(legend, loc='center left', bbox_to_anchor=(1, 0.5))
-
-    if save:
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        plt.savefig('Images/' + file_name, dpi = 300)
-
-    plt.show()
-    plt.close()
-
-def get_2D_plot_data(self,limits):
-    x_array = np.array(np.linspace(limits[0], limits[1], 2000))
-    y_array = np.array(np.linspace(limits[0], limits[1], 2000))
-    z = np.zeros((2000,2000))
-    for i in range(len(x_array)):
-        for j in range(len(y_array)):
-            z[i,j] = self.func(np.array([x_array[i],y_array[j]]))
-    X, Y = np.meshgrid(x_array, y_array)
-
-    plt.show()
-    plt.close()
-
-    return X, Y, z
-
-def plot_2D_func(X, Y, z, save, file_name):
-    from mpl_toolkits.mplot3d import axes3d 
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, z, cmap=plt.get_cmap("bwr"))
-
-    if save:
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        fig.savefig('Images/' + file_name, dpi = 300)
-    
-    plt.show(fig)
-    plt.close(fig)
-
- 
+        import pandas 
+        df = pandas.DataFrame([data], columns = header)
+        df.to_csv(file_name, sep=',', index=False)
+    else:
+        return header, data

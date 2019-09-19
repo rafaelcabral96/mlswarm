@@ -6,7 +6,7 @@ from mlswarm.utils import convert_prob_into_class, get_mean
 def init_layers(nn_architecture, seed, dispersion_factor, seed_between, dispersion_factor_between):
   
     # random seed initiation
-    np.random.seed(seed_within)
+    np.random.seed(seed)
     # number of layers in our neural network
     number_of_layers = len(nn_architecture)
     # parameters storage initiation
@@ -23,7 +23,7 @@ def init_layers(nn_architecture, seed, dispersion_factor, seed_between, dispersi
         
         # initiating the values of the W matrix
         # and vector b for subsequent layers
-        params_values['W' + str(layer_idx)] = np.random.randn(layer_output_size, layer_input_size) * np.sqrt(dispersion_factor_within/(layer_input_size + layer_output_size)) 
+        params_values['W' + str(layer_idx)] = np.random.randn(layer_output_size, layer_input_size) * np.sqrt(dispersion_factor/(layer_input_size + layer_output_size)) 
         params_values['b' + str(layer_idx)] = np.random.randn(layer_output_size, 1) * np.sqrt(dispersion_factor/(layer_input_size + layer_output_size)) 
     
     if dispersion_factor_between > 0:
