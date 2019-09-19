@@ -1,6 +1,6 @@
 from mlswarm.neural_networks import init_layers, full_forward_propagation, get_accuracy_value
 from mlswarm.utils import get_mean, get_var, get_all_parameters_util, kernel_a_finder, flatten_weights, convert_prob_into_class, get_parameters, get_parameters_nn
-from mlswarm.train import train_nn, train_nn2, f_minimize
+from mlswarm.train import train_nn, f_minimize
 from mlswarm.plots import plot_cost_history_util, plot_cost_mean_history_util, plot_var_history_util, plot_gradS_history_util, integral_on_gaussian_measure_util, plot_function_util, plot_cloud_history_util, plot_cost_history2_util, plot_everything_util 
 
 import os
@@ -63,86 +63,6 @@ class _swarm:
     def plot_gradS_history(self, save = False, file_name = "", log = False):
         plot_gradS_history_util(self, save, file_name, log)
 
-
-class neuralnet(_swarm):
-
-    def __init__(self, architecture):
-        super().__init__()
-        self.architecture = architecture
-        self.num_variables = sum( [layer["input_dim"] * layer["output_dim"] + layer["output_dim"] for layer in architecture])
-        self.gradS_history = False
-        self.best_cost = np.inf
-        self.best_nn = None
-    
-    def init_cloud(self, N, cloud_type = "spread", seed = 42, dispersion_factor = 6, seed_between = 43, dispersion_factor_between = 0):
-        self.N = N
-
-        if cloud_type == "spread": 
-            self.cloud = [init_layers(self.architecture, seed + i , dispersion_factor, 0, 0) for i in range(N)]
-        elif cloud_type == "localized":
-            self.cloud = [init_layers(self.architecture, seed, dispersion_factor, seed_between + i, dispersion_factor_between) for i in range(N)]
-        else:
-            raise Exception("Cloud initialization type not found")
-
-        self.cloud_mean = get_mean(self.cloud)
-        cloudf, _, _ = flatten_weights(self.cloud, self.N)
-        cloud_var = get_var(cloudf,np.mean(cloudf,axis=0)) #np.var(cloudf, axis=0) works best
-        self.cloud_var = np.mean(cloud_var)
-
-
-    def train(self, X, Y, parameters_dic = {}):
-
-        #get parameters from parameters_dic
-        parameters = get_parameters_nn(self, X, Y, parameters_dic)
-
-        #find optimal kernel_a
-        #if kernel_a == "auto":
-        #cloudf, _, _ = flatten_weights(self.cloud, self.N) 
-        #kernel_a = kernel_a_finder(cloudf, self.N)
-
-        #start training
-        train_nn(*parameters)
-        #train_nn2(self, X.T, Y.T, "swarm_derivfree", max_epochs = 300, n_batches = 1, batch_size = X.shape[0], learning_rate=0.5, cost_type = 'error_classification', kernel_a = 0.1,  alpha_init = 0, alpha_rate = 5, beta = 0, gamma = 0, verbose = True, var_epsilon = 0)
-
-    def forward_propagation(self, X, cloud):
-        Y, _ = full_forward_propagation(X.T, cloud, self.architecture)
-        return Y.T
-
-    def prediction_accuracy_particle(self, X_test, Y_test, acc_type, particle=0):
-        Y_test_hat = self.forward_propagation(X_test, self.cloud[particle])
-        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
-        print("Test set accuracy using neuralnet {:}: {:.5f}".format(particle, acc_test))
-
-    def prediction_accuracy_mean_particle(self, X_test, Y_test, acc_type):
-        Y_test_hat = self.forward_propagation(X_test, self.cloud_mean)
-        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
-        print("Test set accuracy using cloud mean: {:.5f}".format(acc_test))
-
-    def prediction_accuracy_best_particle(self, X_test, Y_test, acc_type):
-        Y_test_hat = self.forward_propagation(X_test, self.best_nn)
-        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
-        print("Test set accuracy using best neuralnet: {:.5f}".format(acc_test))
-
-
-    def set_cloud(self, cloud):
-        self.cloud = cloud
-        self.cloud_mean = get_mean(self.cloud)
-        self.cloud_var  = get_var(self.cloud)
-
-    def get_cloud_flattened(self):
-        cloudf, _, _ = flatten_weights(self.cloud, self.N) 
-        return cloudf
-
-    def convert_to_class(Y_hat):
-        return convert_prob_into_class(Y_hat)
-
-    def clear(self):
-        super.clear(self)
-        self.num_variables = None
-        self.architecture = None
-
-
-
 class function(_swarm):
 
     def __init__(self, func, name = ""):
@@ -202,8 +122,8 @@ class function(_swarm):
         self.function_values = self.func(self.cloud.T)
         
         #store best value respective position found. To be updated during optimization
-        self.best_value = np.nanmin(self.function_values)
-        self.best_position = self.cloud[np.nanargmin(self.function_values)]
+        self.best_value = np.nanmin(self.function_values) + 0 
+        self.best_position = self.cloud[np.nanargmin(self.function_values)] + 0
         
     def evaluate(self, cloud):
 
@@ -223,7 +143,7 @@ class function(_swarm):
 
         """
 
-        return self.func(cloud).T
+        return self.func(np.array(cloud).T)
 
 
     def minimize(self, parameters_dic = {}):
@@ -337,6 +257,84 @@ class function(_swarm):
     def plot_cost_history2(self, save = False, file_name = "", log = False):
         plot_cost_history2_util(self, save, file_name, log)
 
+
+
+class neuralnet(_swarm):
+
+    def __init__(self, architecture):
+        super().__init__()
+        self.architecture = architecture
+        self.num_variables = sum( [layer["input_dim"] * layer["output_dim"] + layer["output_dim"] for layer in architecture])
+        self.gradS_history = False
+        self.best_cost = np.inf
+        self.best_nn = None
+    
+    def init_cloud(self, N, cloud_type = "spread", seed = 42, dispersion_factor = 6, seed_between = 43, dispersion_factor_between = 0):
+        self.N = N
+
+        if cloud_type == "spread": 
+            self.cloud = [init_layers(self.architecture, seed + i , dispersion_factor, 0, 0) for i in range(N)]
+        elif cloud_type == "localized":
+            self.cloud = [init_layers(self.architecture, seed, dispersion_factor, seed_between + i, dispersion_factor_between) for i in range(N)]
+        else:
+            raise Exception("Cloud initialization type not found")
+
+        self.cloud_mean = get_mean(self.cloud)
+        cloudf, _, _ = flatten_weights(self.cloud, self.N)
+        cloud_var = get_var(cloudf,np.mean(cloudf,axis=0)) #np.var(cloudf, axis=0) works best
+        self.cloud_var = np.mean(cloud_var)
+
+
+    def train(self, X, Y, parameters_dic = {}):
+
+        #get parameters from parameters_dic
+        parameters = get_parameters_nn(self, X, Y, parameters_dic)
+
+        #find optimal kernel_a
+        #if kernel_a == "auto":
+        #cloudf, _, _ = flatten_weights(self.cloud, self.N) 
+        #kernel_a = kernel_a_finder(cloudf, self.N)
+
+        #start training
+        train_nn(*parameters)
+        #train_nn2(self, X.T, Y.T, "swarm_derivfree", max_epochs = 300, n_batches = 1, batch_size = X.shape[0], learning_rate=0.5, cost_type = 'error_classification', kernel_a = 0.1,  alpha_init = 0, alpha_rate = 5, beta = 0, gamma = 0, verbose = True, var_epsilon = 0)
+
+    def forward_propagation(self, X, cloud):
+        Y, _ = full_forward_propagation(X.T, cloud, self.architecture)
+        return Y.T
+
+    def prediction_accuracy_particle(self, X_test, Y_test, acc_type, particle=0):
+        Y_test_hat = self.forward_propagation(X_test, self.cloud[particle])
+        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
+        print("Test set accuracy using neuralnet {:}: {:.5f}".format(particle, acc_test))
+
+    def prediction_accuracy_mean_particle(self, X_test, Y_test, acc_type):
+        Y_test_hat = self.forward_propagation(X_test, self.cloud_mean)
+        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
+        print("Test set accuracy using cloud mean: {:.5f}".format(acc_test))
+
+    def prediction_accuracy_best_particle(self, X_test, Y_test, acc_type):
+        Y_test_hat = self.forward_propagation(X_test, self.best_nn)
+        acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
+        print("Test set accuracy using best neuralnet: {:.5f}".format(acc_test))
+
+
+    def set_cloud(self, cloud):
+        self.cloud = cloud
+        self.cloud_mean = get_mean(self.cloud)
+        self.cloud_var  = get_var(self.cloud)
+
+    def get_cloud_flattened(self):
+        cloudf, _, _ = flatten_weights(self.cloud, self.N) 
+        return cloudf
+
+    def convert_to_class(Y_hat):
+        return convert_prob_into_class(Y_hat)
+
+    def clear(self):
+        super.clear(self)
+        self.num_variables = None
+        self.architecture = None
 
 def plot_data(x, fx, title, xlabel, ylabel, legend = None, log = False, save = False, file_name = ""):
     plot_data_util(x, fx, title, xlabel, ylabel, legend, log, save, file_name)

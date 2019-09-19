@@ -30,8 +30,8 @@ def timerfunc(func):
     return function_timer
 
 def get_var(cloud, cloud_mean = 0):
-     return np.sum( (cloud - cloud_mean)**2, axis=0)/cloud.shape[0] #use biased version
-
+     #return np.sum( (cloud - cloud_mean)**2, axis=0)/cloud.shape[0] #use biased version
+     return np.var(cloud,axis=0)
 
 def gradient(func, x, h = None):
     if h is None:

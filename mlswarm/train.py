@@ -1,7 +1,7 @@
 import numpy as np
 from mlswarm.neural_networks import init_layers, full_forward_propagation, full_backward_propagation, get_cost_func, get_cost_func_deriv, get_accuracy_value
 from mlswarm.utils import timerfunc, get_mean, get_var, gradient, gradS, flatten_weights, flatten_weights_gradients, unflatten_weights
-from mlswarm.optimizers import  update_cloud_derivative_free, update_cloud, nesterov, adaptive_step_size, update_nn_weights_derivative_free
+from mlswarm.optimizers import  update_cloud_derivative_free, update_cloud, nesterov, adaptive_step_size
 
 
 @timerfunc
