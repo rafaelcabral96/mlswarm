@@ -1,2 +1,2 @@
-name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
-Schaffer function N. 2,20,9.998637229701067e-05,swarm_derivfree,141360,1.6907312999996975,1.6875,10000,0.0001,0.01,0.01,0,1,0,1
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Schaffer function N. 2,9,1.6889286617254406e-05,[-5.1252e-05 -5.1252e-05],0.e+00,gradient_free,euler_adaptive,28,252,0.012116999999989275,0.015625,10000,0,0.0001,0.01,1,0,1,0,0,0

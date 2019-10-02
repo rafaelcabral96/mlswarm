@@ -226,7 +226,9 @@ class function(_swarm):
 
         """
 
-        get_all_parameters_util(self, save, file_name)
+        header, parameters = get_all_parameters_util(self, save, file_name)
+
+        return header, parmeters
 
 
     def plot_everything(self, folder_name, f_dim, log = False, limits =[-5,5,-5,5]):

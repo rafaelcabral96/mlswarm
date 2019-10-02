@@ -1,0 +1,2 @@
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Lévi function N.13,9,8.644867540415095e-06,[0.99989 0.99208],6.397523592681415e-05,gradient_free,euler_adaptive,56,504,0.02024180000000797,0.015625,10000,0,1e-05,0.01,1,0,1,0,0,0

@@ -1,2 +1,2 @@
-name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
-Xin-She Yang N. 4 Function,200,9.995227120702097e-05,swarm_derivfree,447600,3.03974960000005,3.046875,100000,0.0001,0.01,0.1,0,1,0,1
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Xin-She Yang N. 4 Function,30,0.009897228675037829,[ 0.02342 -0.00941  1.683   -3.27473 -2.7588 ],-9.666774008062905e-01,gradient_free,euler_adaptive,67,2010,0.03786790000003748,0.03125,10000,0,0.01,0.01,1,0,1,0,0,0

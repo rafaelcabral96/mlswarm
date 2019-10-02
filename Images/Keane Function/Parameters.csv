@@ -1,2 +1,2 @@
-name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
-Keane Function,50,9.998668216887555e-05,swarm_derivfree,111150,0.6526965999996719,0.65625,100000,0.0001,0.01,0.1,0,1,0,1
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Keane Function,9,0.009355435662323747,[-0.03135  1.42437],-6.709794392552887e-01,gradient_free,euler_adaptive,62,558,0.029528400000003785,0.03125,10000,0,0.01,0.01,1,0,1,0,0,0

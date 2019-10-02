@@ -1,2 +1,2 @@
-name,N,cloud_var,train_method,function_evaluations,clock_time,cpu_time,max_iterations,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma
-Cross-in-Tray Function,50,9.998463947525645e-05,swarm_derivfree,277300,1.9130003000000215,1.921875,100000,0.0001,0.01,0.1,0,1,0,1
+name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
+Cross-in-Tray Function,9,0.08725740840357771,[1.39344 1.40968],-2.0620106560063336e+00,gradient_free,euler_adaptive,20,180,0.009476500000005217,0.015625,10000,0,0.1,0.01,1,0,1,0,0,0

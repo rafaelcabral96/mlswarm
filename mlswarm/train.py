@@ -217,7 +217,7 @@ def train_nn(self, X, Y,  method, max_epochs, n_batches,  batch_size, lr,
 
             elif method == 'gradient_free':
                 cloudf, nn_shape, weight_names = flatten_weights(self.cloud, self.N)
-                update, var = update_cloud_derivative_free(cloudf, costs, lr, self.N, kernel_a, alpha, beta, gamma)
+                update, var = update_cloud_derivative_free(self,cloudf, costs, lr, self.N, kernel_a, alpha, beta, gamma)
 
             else:
                 raise Exception("Train method not found")

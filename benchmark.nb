@@ -1,0 +1,1588 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     60785,       1580]
+NotebookOptionsPosition[     57890,       1522]
+NotebookOutlinePosition[     58231,       1537]
+CellTagsIndexPosition[     58188,       1534]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[TextData[StyleBox["1D Functions", "Subsection"]], "Chapter",
+ CellChangeTimes->{{3.77744289157399*^9, 
+  3.777442937374259*^9}},ExpressionUUID->"ae295f21-f530-4b93-9562-\
+3bcafd76120e"],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"methods", " ", "=", " ", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<DifferentialEvolution\>\"", ",", "\"\<MeshSearch\>\"", ",", 
+       "\"\<NelderMead\>\"", ",", "\"\<SimulatedAnnealing\>\""}], "}"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"evalmonitor", "[", 
+     RowBox[{"func0_", ",", "space0_"}], "]"}], " ", ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"func", " ", "=", " ", "func0"}], ",", 
+        RowBox[{"space", " ", "=", " ", "space0"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"f", "[", 
+         RowBox[{"x_", "?", "NumberQ"}], "]"}], ":=", 
+        RowBox[{"Module", "[", 
+         RowBox[{
+          RowBox[{"{", "}"}], ",", 
+          RowBox[{
+           RowBox[{"Sow", "[", "x", "]"}], ";", "func"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"de", " ", "=", " ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", "x", "]"}], ",", "space", ",", 
+            RowBox[{
+            "Method", " ", "\[Rule]", " ", 
+             "\"\<DifferentialEvolution\>\""}]}], "]"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"ms", " ", "=", " ", 
+        RowBox[{"Timing", "[", " ", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", "x", "]"}], ",", "space", ",", 
+            RowBox[{"Method", " ", "\[Rule]", " ", "\"\<MeshSearch\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"nm", " ", "=", "  ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", "x", "]"}], ",", "space", ",", 
+            RowBox[{"Method", " ", "\[Rule]", " ", "\"\<NelderMead\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"sa", " ", "=", " ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", "x", "]"}], ",", "space", ",", 
+            RowBox[{
+            "Method", " ", "\[Rule]", " ", "\"\<SimulatedAnnealing\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"evaltime", " ", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"de", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"ms", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"nm", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"sa", "[", 
+           RowBox[{"[", "1", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"trace", " ", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"Flatten", "[", 
+           RowBox[{"de", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "2"}], "]"}], "]"}], "]"}], ",", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"ms", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "2"}], "]"}], "]"}], "]"}], ",", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"nm", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "2"}], "]"}], "]"}], "]"}], ",", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"sa", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "2"}], "]"}], "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"numbereval", " ", "=", " ", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Length", "[", 
+           RowBox[{"trace", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], "]"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "4"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", " ", 
+       RowBox[{"fvalues", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"de", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"ms", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"nm", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"sa", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"xvalues", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"x", " ", "/.", " ", 
+           RowBox[{"de", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}]}], ",", 
+          RowBox[{"x", " ", "/.", " ", 
+           RowBox[{"ms", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}]}], ",", 
+          RowBox[{"x", " ", "/.", " ", 
+           RowBox[{"nm", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}]}], ",", 
+          RowBox[{"x", " ", "/.", " ", 
+           RowBox[{"sa", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}]}]}], "}"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"tabledata", " ", "=", 
+        RowBox[{"{", 
+         RowBox[{
+         "methods", ",", "evaltime", ",", "numbereval", ",", "xvalues", ",", 
+          "fvalues"}], "}"}]}], " ", ";", "\[IndentingNewLine]", 
+       RowBox[{"labels", " ", "=", 
+        RowBox[{"{", 
+         RowBox[{
+         "\"\<Method\>\"", ",", "\"\<Evaluation Time\>\"", ",", 
+          "\"\<Function Evaluations\>\"", ",", "\"\<x\>\"", ",", 
+          "\"\<f(x)\>\""}], "}"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"table", "=", 
+        RowBox[{
+         RowBox[{"Transpose", "[", 
+          RowBox[{"Join", "[", 
+           RowBox[{
+            RowBox[{"Partition", "[", 
+             RowBox[{"labels", ",", "1"}], "]"}], ",", "tabledata", ",", 
+            "2"}], "]"}], "]"}], " ", "//", " ", "TableForm"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"table", ",", "trace"}], "}"}]}]}], "\[IndentingNewLine]", 
+     "]"}]}]}]}]], "Input",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQB2IQ/Syk+OEslTeOQVMq34Lon9vTPoPotXcDv4Boq5Dl
+P0D0AvlXv0E014aNjLOBtJzcci4QzXfQQAhE89iLioPogInqciD62+MfKiA6
+5eZtDRC9bMIqMxB9x4p5/X4gXfhqxyYQve2i+T4QnXDF+BCI/uGr/RtE90R4
+gGmVSesZDgDpiWz2TCDaq0WQB0QfaXvIC6I3sq2XBdHXtt9QBNGVnu9VQbRJ
+jqQWiK6JENMD0Qo9gWDaNv/hNRDdd9b1Doh+9ffAMxB9d/2LbyB6wf6ss0+A
+9MvfB8F0XbjJcxBtJhTzEkSHLG94B6Ltv518D6LnBFr/BNEWu0q5noLs2RvM
+B6LFb7nwg2gG5bNVu9WB4cOnWQ2iAbn7uxM=
+  "],
+ CellLabel->"In[49]:=",ExpressionUUID->"2dd0555a-9949-4e67-8add-d97b955fdf60"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor", "[", 
+    RowBox[{
+     RowBox[{"x", "^", "2"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", 
+       RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func1.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.777288161960308*^9, 3.7772881886464663`*^9}, 
+   3.7772882512135057`*^9, {3.7772883998780518`*^9, 3.777288411615672*^9}, {
+   3.777288618201933*^9, 3.777288619039691*^9}, {3.7773633185530725`*^9, 
+   3.777363333163037*^9}, {3.7773634101236486`*^9, 3.777363423987507*^9}, 
+   3.7773637750223465`*^9, {3.7773638674764132`*^9, 3.777363870392593*^9}, 
+   3.777363942445906*^9, {3.777364358965564*^9, 3.777364363052265*^9}, {
+   3.77736457976777*^9, 3.777364588107544*^9}, {3.7773659884607315`*^9, 
+   3.777365989075638*^9}, {3.7774398212836275`*^9, 3.7774398377707677`*^9}, {
+   3.777442022258185*^9, 3.7774420243702326`*^9}, {3.7774430185232573`*^9, 
+   3.777443026543806*^9}},
+ CellLabel->"In[51]:=",ExpressionUUID->"300d79b3-d69e-47f9-9f27-9da4619e0138"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.03125`", "798", 
+     RowBox[{"-", "7.450580596923828`*^-9"}], "5.551115123125783`*^-17"},
+    {"\<\"MeshSearch\"\>", "0.046875`", "738", 
+     RowBox[{"-", "7.450581734902428`*^-9"}], "5.551116818846168`*^-17"},
+    {"\<\"NelderMead\"\>", "0.015625`", "160", 
+     RowBox[{"-", "7.450580596923828`*^-9"}], "5.551115123125783`*^-17"},
+    {"\<\"SimulatedAnnealing\"\>", "0.`", "187", 
+     RowBox[{"-", "7.450583205947936`*^-9"}], "5.551119010875342`*^-17"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.7774398389972115`*^9, 3.7774398693203835`*^9, 
+  3.777442034266408*^9, 3.7774430688053193`*^9, 3.7789275819541073`*^9, 
+  3.778930284031654*^9},
+ CellLabel->
+  "Out[53]//TableForm=",ExpressionUUID->"148c7c4e-01f6-40a5-b8bf-\
+596d4feea320"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"x", "^", "2"}], "-", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Cos", "[", 
+         RowBox[{"4", "*", "Pi", "*", "x"}], "]"}], "-", "1"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", 
+       RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func2.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.7774420686026917`*^9, 3.777442069325102*^9}, {
+  3.7774422340183644`*^9, 3.777442261725955*^9}, {3.777443030816352*^9, 
+  3.777443049235531*^9}},
+ CellLabel->"In[54]:=",ExpressionUUID->"9774436c-cb63-4681-8730-21a5df0d85c9"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.046875`", "1117", 
+     RowBox[{"-", "0.49374026040431457`"}], "0.24687172119384138`"},
+    {"\<\"MeshSearch\"\>", "0.046875`", "1016", 
+     RowBox[{"-", "7.176486580666725`*^-9"}], "4.107825191113079`*^-15"},
+    {"\<\"NelderMead\"\>", "0.`", "311", 
+     RowBox[{"-", "0.987441843781421`"}], "0.9874676422784328`"},
+    {"\<\"SimulatedAnnealing\"\>", "0.015625`", "356", 
+     RowBox[{"-", "0.4937402602881962`"}], "0.24687172119384115`"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.7774430559866276`*^9, 3.7789275864219885`*^9, 
+  3.7789302864303703`*^9},
+ CellLabel->
+  "Out[56]//TableForm=",ExpressionUUID->"037fa24e-a65f-4c6f-a6b3-\
+fece2c247394"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"x", "^", "4"}], "-", " ", 
+      RowBox[{"2", "*", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Cos", "[", 
+          RowBox[{"2", "*", "Pi", "*", "x"}], "]"}], "-", "1"}], ")"}]}], " ",
+       "-", 
+      RowBox[{"x", "^", "2"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", 
+       RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func3.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table", "\[IndentingNewLine]"}], \
+"Input",
+ CellChangeTimes->{{3.7774420686026917`*^9, 3.777442069325102*^9}, {
+  3.7774422340183644`*^9, 3.777442261725955*^9}, {3.777443030816352*^9, 
+  3.777443053513386*^9}},
+ CellLabel->"In[57]:=",ExpressionUUID->"9e360c03-4880-48a6-9788-44933613c5cc"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.046875`", "821", 
+     RowBox[{"-", "0.9773811852961912`"}], 
+     RowBox[{"-", "0.022561990238678664`"}]},
+    {"\<\"MeshSearch\"\>", "0.046875`", "1130", "0.9773811752482691`", 
+     RowBox[{"-", "0.022561990238680885`"}]},
+    {"\<\"NelderMead\"\>", "0.015625`", "266", 
+     RowBox[{"-", "0.9773811792979348`"}], 
+     RowBox[{"-", "0.022561990238681218`"}]},
+    {"\<\"SimulatedAnnealing\"\>", "0.015625`", "325", 
+     RowBox[{"-", "0.9773811796403328`"}], 
+     RowBox[{"-", "0.022561990238681107`"}]}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.777443062272812*^9, 3.778927589574955*^9, 
+  3.778930288561736*^9},
+ CellLabel->
+  "Out[59]//TableForm=",ExpressionUUID->"14da8794-aba7-4f7c-b3c4-\
+9829eab46357"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"Sin", "[", 
+        RowBox[{"10", "*", "Pi", "*", "x"}], "]"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", "*", "x"}], ")"}]}], " ", "+", " ", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x", "-", "1"}], ")"}], "^", "4"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", 
+       RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func4.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table", "\[IndentingNewLine]"}], \
+"Input",
+ CellChangeTimes->{{3.7789276231347723`*^9, 3.7789276232254972`*^9}, {
+  3.7789276589948864`*^9, 3.778927674886219*^9}},
+ CellLabel->"In[60]:=",ExpressionUUID->"805d08df-fb20-45de-a934-454a4bc46750"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.0625`", "1159", 
+     "0.14377916663779094`", 
+     RowBox[{"-", "2.8738989416295357`"}]},
+    {"\<\"MeshSearch\"\>", "0.03125`", "814", "0.14377916663295343`", 
+     RowBox[{"-", "2.8738989416295357`"}]},
+    {"\<\"NelderMead\"\>", "0.015625`", "225", "0.1437791728974822`", 
+     RowBox[{"-", "2.873898941629626`"}]},
+    {"\<\"SimulatedAnnealing\"\>", "0.015625`", "541", "1.348785157358655`", 
+     RowBox[{"-", "0.35563502339107894`"}]}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.7789276779901743`*^9, 3.7789302906095986`*^9},
+ CellLabel->
+  "Out[62]//TableForm=",ExpressionUUID->"1cde7058-c375-49b4-97ae-\
+49f460bf3b4a"]
+}, Open  ]],
+
+Cell[BoxData[
+ StyleBox[
+  RowBox[{"2", "D", " ", "Functions"}], "Subsection"]], "Input",
+ CellChangeTimes->{{3.7774429555428286`*^9, 
+  3.7774429727637615`*^9}},ExpressionUUID->"68280c27-4b5d-4615-9d56-\
+9d1e367bff6c"],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"methods", " ", "=", " ", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<DifferentialEvolution\>\"", ",", "\"\<MeshSearch\>\"", ",", 
+       "\"\<NelderMead\>\"", ",", "\"\<SimulatedAnnealing\>\""}], "}"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"MKF", " ", "=", " ", 
+     RowBox[{
+      RowBox[{"Function", "[", 
+       RowBox[{"#1", ",", "#2"}], "]"}], " ", "&"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"evalmonitor2D", "[", 
+     RowBox[{"func0_", ",", "space0_"}], "]"}], " ", ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"func", " ", "=", " ", "func0"}], ",", 
+        RowBox[{"space", " ", "=", " ", "space0"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"f", "[", 
+         RowBox[{
+          RowBox[{"x_", "?", "NumberQ"}], ",", 
+          RowBox[{"y_", "?", "NumberQ"}]}], "]"}], ":=", 
+        RowBox[{"Module", "[", 
+         RowBox[{
+          RowBox[{"{", "}"}], ",", 
+          RowBox[{
+           RowBox[{"Sow", "[", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "y"}], "}"}], "]"}], ";", "func"}]}], "]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"de", " ", "=", " ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", 
+             RowBox[{"x", ",", "y"}], "]"}], ",", "space", ",", 
+            RowBox[{
+            "Method", " ", "\[Rule]", " ", 
+             "\"\<DifferentialEvolution\>\""}]}], "]"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"ms", " ", "=", " ", 
+        RowBox[{"Timing", "[", " ", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", 
+             RowBox[{"x", ",", "y"}], "]"}], ",", "space", ",", 
+            RowBox[{"Method", " ", "\[Rule]", " ", "\"\<MeshSearch\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"nm", " ", "=", "  ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", 
+             RowBox[{"x", ",", "y"}], "]"}], ",", "space", ",", 
+            RowBox[{"Method", " ", "\[Rule]", " ", "\"\<NelderMead\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"sa", " ", "=", " ", 
+        RowBox[{"Timing", "[", 
+         RowBox[{"Reap", "[", 
+          RowBox[{"NMinimize", "[", 
+           RowBox[{
+            RowBox[{"f", "[", 
+             RowBox[{"x", ",", "y"}], "]"}], ",", "space", ",", 
+            RowBox[{
+            "Method", " ", "\[Rule]", " ", "\"\<SimulatedAnnealing\>\""}]}], 
+           "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"evaltime", " ", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"de", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"ms", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"nm", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"sa", "[", 
+           RowBox[{"[", "1", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"fvalues", " ", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"de", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"ms", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"nm", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+          RowBox[{"sa", "[", 
+           RowBox[{"[", 
+            RowBox[{"2", ",", "1", ",", "1"}], "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"xvalues", " ", "=", "  ", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"x", ",", "y"}], "}"}], " ", "/.", "  ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"de", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}], ",", 
+           RowBox[{"ms", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}], ",", 
+           RowBox[{"nm", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}], ",", 
+           RowBox[{"sa", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", "1", ",", "2"}], "]"}], "]"}]}], "}"}]}]}], 
+       ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"trace", " ", "=", 
+        RowBox[{"{", " ", 
+         RowBox[{
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{"de", "[", 
+             RowBox[{"[", 
+              RowBox[{"2", ",", "2"}], "]"}], "]"}], ",", "1"}], "]"}], ",", 
+          " ", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{"ms", "[", 
+             RowBox[{"[", 
+              RowBox[{"2", ",", "2"}], "]"}], "]"}], ",", "1"}], "]"}], ",", 
+          " ", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{"nm", "[", 
+             RowBox[{"[", 
+              RowBox[{"2", ",", "2"}], "]"}], "]"}], ",", "1"}], "]"}], ",", 
+          " ", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{"sa", "[", 
+             RowBox[{"[", 
+              RowBox[{"2", ",", "2"}], "]"}], "]"}], ",", "1"}], "]"}]}], 
+         "}"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"numbereval", " ", "=", " ", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Length", "[", 
+           RowBox[{"trace", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], "]"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "4"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"fx", " ", "=", " ", 
+        RowBox[{"MKF", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"x", ",", "y"}], "}"}], ",", "func"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"ftrace", " ", "=", " ", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"fx", "[", 
+             RowBox[{
+              RowBox[{"trace", "[", 
+               RowBox[{"[", 
+                RowBox[{"j", ",", "i", ",", "1"}], "]"}], "]"}], ",", 
+              RowBox[{"trace", "[", 
+               RowBox[{"[", 
+                RowBox[{"j", ",", "i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", "1", ",", 
+              RowBox[{"Length", "[", 
+               RowBox[{"trace", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], "]"}]}], "}"}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "4"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"tabledata", " ", "=", 
+        RowBox[{"{", 
+         RowBox[{
+         "methods", ",", "evaltime", ",", "numbereval", ",", "xvalues", ",", 
+          "fvalues"}], "}"}]}], " ", ";", "\[IndentingNewLine]", 
+       RowBox[{"labels", " ", "=", 
+        RowBox[{"{", 
+         RowBox[{
+         "\"\<Method\>\"", ",", "\"\<Evaluation Time\>\"", ",", 
+          "\"\<Function Evaluations\>\"", ",", "\"\<x\>\"", ",", 
+          "\"\<f(x)\>\""}], "}"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"table", "=", 
+        RowBox[{
+         RowBox[{"Transpose", "[", 
+          RowBox[{"Join", "[", 
+           RowBox[{
+            RowBox[{"Partition", "[", 
+             RowBox[{"labels", ",", "1"}], "]"}], ",", "tabledata", ",", 
+            "2"}], "]"}], "]"}], " ", "//", " ", "TableForm"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"table", ",", "ftrace"}], "}"}]}]}], "\[IndentingNewLine]", 
+     "]"}]}]}]}]], "Input",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQB2IQ3f66mO+AyhvH9cUeYiDa0K/BBETHNE6wAdHX2Bc6
+g+jeXavdQbRR3/Y8EJ0VIV4Moo+4mbaA6AfXWsD0nB/Gl58AaZ/SI1dBdIaI
+zy0Q7cTn+wxEdxXZvgHROoud3oLoLS8mqTwFqT8Vbwyi53Vy2IPoGdvOBYDo
+Ku7eKjC/KLkZRN9wtWwH0bFRBhNAdMzyKVNB9NTVL+eA6Ir09mUgeu3ag8tB
+dHo0124QHfDM+gCILgsIeACi+w/MfgWiGUwfvAPRB56d+wiid3B9/wair9ny
+sDwD0hF+fpIgep9XoBSINvtuHwmilYtmR4HoiValZSB6Ck8dmO56qNYGou89
+KQHTSYs6H4JovlnPHoNoAB+OwS0=
+  "],
+ CellLabel->"In[22]:=",ExpressionUUID->"3553bb15-985e-4986-be01-5406ed9bc701"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+     RowBox[{"evalmonitor2D", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"1.5", "-", "x", "+", 
+           RowBox[{"x", "*", "y"}]}], ")"}], "^", "2"}], "+", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"2.25", "-", "x", "+", 
+           RowBox[{"x", "*", 
+            RowBox[{"y", "^", "2"}]}]}], ")"}], "^", "2"}], "+", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"2.625", "-", "x", "+", 
+           RowBox[{"x", "*", 
+            RowBox[{"y", "^", "3"}]}]}], "\[IndentingNewLine]", ")"}], "^", 
+         "2"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"x", ",", 
+           RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"y", ",", 
+           RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Export", "[", 
+     RowBox[{"\"\<func5.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+     "]"}], ";"}], "\[IndentingNewLine]", "table"}]}]], "Input",
+ CellChangeTimes->{{3.778927835174488*^9, 3.778927920921613*^9}},
+ CellLabel->"In[63]:=",ExpressionUUID->"9f53918f-3615-4be1-8d1d-3d83b882460d"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.140625`", "2784", GridBox[{
+       {"2.9999995135340853`"},
+       {"0.49999987260792805`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "3.8933551937849343`*^-14"},
+    {"\<\"MeshSearch\"\>", "0.125`", "2674", GridBox[{
+       {"2.99999952479143`"},
+       {"0.4999998762880152`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "3.694170146534803`*^-14"},
+    {"\<\"NelderMead\"\>", "0.046875`", "759", GridBox[{
+       {"2.9999999983738768`"},
+       {"0.4999999995878901`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "4.250658300098648`*^-19"},
+    {"\<\"SimulatedAnnealing\"\>", "0.09375`", "2754", GridBox[{
+       {"2.999999513570717`"},
+       {"0.4999998719282854`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "3.915367247419287`*^-14"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.140625, 2784, {2.9999995135340853`, 
+     0.49999987260792805`}, 3.8933551937849343`*^-14}, {
+    "MeshSearch", 0.125, 2674, {2.99999952479143, 0.4999998762880152}, 
+     3.694170146534803*^-14}, {
+    "NelderMead", 0.046875, 759, {2.9999999983738768`, 0.4999999995878901}, 
+     4.250658300098648*^-19}, {
+    "SimulatedAnnealing", 0.09375, 2754, {2.999999513570717, 
+     0.4999998719282854}, 3.915367247419287*^-14}}]]], "Output",
+ CellChangeTimes->{3.7789279397913733`*^9, 3.778930296317244*^9},
+ CellLabel->
+  "Out[65]//TableForm=",ExpressionUUID->"45ee6c06-9db7-4d19-a6c4-\
+eba310f56ef2"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor2D", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "20"}], "*", 
+       RowBox[{"Exp", "[", 
+        RowBox[{
+         RowBox[{"-", "0.2"}], "*", 
+         RowBox[{"Sqrt", "[", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"x", "^", "2"}], "+", 
+             RowBox[{"y", "^", "2"}]}], ")"}], "/", "2"}], "]"}]}], "]"}]}], 
+      " ", "-", " ", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Cos", "[", 
+           RowBox[{"2", "*", "Pi", "*", "x"}], "]"}], " ", "+", " ", 
+          RowBox[{"Cos", "[", 
+           RowBox[{"2", "*", "Pi", "*", "y"}], "]"}]}], ")"}], "/", "2"}], 
+       "]"}], " ", "+", " ", "20", "  ", "+", " ", 
+      RowBox[{"Exp", "[", "1", "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"y", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func6.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.7752801875842514`*^9, 3.7752801915356703`*^9}, {
+  3.775286910418235*^9, 3.775286931032771*^9}, {3.775287631802311*^9, 
+  3.775287651213304*^9}, {3.775288080177602*^9, 3.7752881230125*^9}, {
+  3.775289952854826*^9, 3.7752899578377476`*^9}, {3.7752900070026197`*^9, 
+  3.775290095538864*^9}, {3.775290932768069*^9, 3.7752911164763155`*^9}, {
+  3.7774424732764883`*^9, 3.7774425256321516`*^9}, {3.7774430819677553`*^9, 
+  3.7774431000494485`*^9}, {3.7789278133054676`*^9, 3.7789278498400593`*^9}},
+ CellLabel->"In[66]:=",ExpressionUUID->"c9d4c5a9-158e-4f7f-bbf0-53994e36c33d"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.140625`", "2686", GridBox[{
+       {
+        RowBox[{"-", "5.032613087114947`*^-9"}]},
+       {"3.5898115235570766`*^-9"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "1.748461020412151`*^-8"},
+    {"\<\"MeshSearch\"\>", "0.140625`", "2698", GridBox[{
+       {
+        RowBox[{"-", "1.4473732858150796`*^-9"}]},
+       {
+        RowBox[{"-", "1.0452673198304256`*^-9"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "5.049731299777704`*^-9"},
+    {"\<\"NelderMead\"\>", "0.046875`", "1060", GridBox[{
+       {
+        RowBox[{"-", "8.690102761589416`*^-11"}]},
+       {
+        RowBox[{"-", "2.194901217962973`*^-10"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "6.677005615074449`*^-10"},
+    {"\<\"SimulatedAnnealing\"\>", "0.046875`", "757", GridBox[{
+       {
+        RowBox[{"-", "7.499272764269855`*^-9"}]},
+       {
+        RowBox[{"-", "0.9521665505287947`"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "2.5799275570298748`"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.140625, 2686, {-5.032613087114947*^-9, 
+     3.5898115235570766`*^-9}, 1.748461020412151*^-8}, {
+    "MeshSearch", 0.140625, 
+     2698, {-1.4473732858150796`*^-9, -1.0452673198304256`*^-9}, 
+     5.049731299777704*^-9}, {
+    "NelderMead", 0.046875, 
+     1060, {-8.690102761589416*^-11, -2.194901217962973*^-10}, 
+     6.677005615074449*^-10}, {
+    "SimulatedAnnealing", 0.046875, 
+     757, {-7.499272764269855*^-9, -0.9521665505287947}, 
+     2.5799275570298748`}}]]], "Output",
+ CellChangeTimes->{{3.7774430923370852`*^9, 3.777443103044668*^9}, 
+   3.777443623481946*^9, 3.7789279514467325`*^9, 3.7789279822773156`*^9, 
+   3.778930299038813*^9},
+ CellLabel->
+  "Out[68]//TableForm=",ExpressionUUID->"da054b23-ddfb-4767-bfa8-\
+507e51901bb6"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor2D", "[", 
+    RowBox[{
+     RowBox[{"0.5", " ", "+", " ", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Sin", "[", 
+           RowBox[{
+            RowBox[{"x", "^", "2"}], "-", 
+            RowBox[{"y", "^", "2"}]}], "]"}], "^", "2"}], "-", "0.5"}], ")"}],
+        "/", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"0.001", "*", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"x", "^", "2"}], "+", 
+             RowBox[{"y", "^", "2"}]}], ")"}]}]}], ")"}], "^", "2"}]}]}], " ",
+      ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"y", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func7.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.7789280182199636`*^9, 3.7789280716538506`*^9}, {
+  3.778928182207929*^9, 3.778928220112549*^9}},
+ CellLabel->"In[69]:=",ExpressionUUID->"595c417f-fd1b-47ec-8283-bcd13be67d1f"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.109375`", "2407", GridBox[{
+       {"1.3496711197426344`*^-7"},
+       {
+        RowBox[{"-", "1.9272102400401606`*^-6"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "3.774758283725532`*^-15"},
+    {"\<\"MeshSearch\"\>", "0.140625`", "2378", GridBox[{
+       {
+        RowBox[{"-", "2.6639015077659673`*^-6"}]},
+       {
+        RowBox[{"-", "7.315545277992279`*^-7"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "7.549516567451064`*^-15"},
+    {"\<\"NelderMead\"\>", "0.078125`", "2379", GridBox[{
+       {
+        RowBox[{"-", "1.3472122350268476`*^-6"}]},
+       {"3.5192765045289134`*^-6"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "1.4210854715202004`*^-14"},
+    {"\<\"SimulatedAnnealing\"\>", "0.09375`", "2367", GridBox[{
+       {"2.190525803699456`*^-6"},
+       {"1.3658603639116694`*^-6"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "6.661338147750939`*^-15"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.109375, 2407, {
+     1.3496711197426344`*^-7, -1.9272102400401606`*^-6}, 
+     3.774758283725532*^-15}, {
+    "MeshSearch", 0.140625, 
+     2378, {-2.6639015077659673`*^-6, -7.315545277992279*^-7}, 
+     7.549516567451064*^-15}, {
+    "NelderMead", 0.078125, 2379, {-1.3472122350268476`*^-6, 
+     3.5192765045289134`*^-6}, 1.4210854715202004`*^-14}, {
+    "SimulatedAnnealing", 0.09375, 2367, {2.190525803699456*^-6, 
+     1.3658603639116694`*^-6}, 6.661338147750939*^-15}}]]], "Output",
+ CellChangeTimes->{3.778928221710126*^9, 3.7789303017639956`*^9},
+ CellLabel->
+  "Out[71]//TableForm=",ExpressionUUID->"8a2d8e0b-1e8e-4b1f-bff1-\
+415726670007"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor2D", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"Sin", "[", 
+        RowBox[{"3", "*", "Pi", "*", "x"}], "]"}], "^", "2"}], " ", "+", " ", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"x", "-", "1"}], ")"}], "^", "2"}], "*", 
+       RowBox[{"(", 
+        RowBox[{"1", "+", 
+         RowBox[{
+          RowBox[{"Sin", "[", 
+           RowBox[{"3", "*", "Pi", "*", "y"}], "]"}], "^", "2"}]}], ")"}]}], 
+      "+", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"y", "-", "1"}], ")"}], "^", "2"}], "*", 
+       RowBox[{"(", 
+        RowBox[{"1", "+", 
+         RowBox[{
+          RowBox[{"Sin", "[", 
+           RowBox[{"2", "*", "Pi", "*", "y"}], "]"}], "^", "2"}]}], ")"}]}]}],
+      ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"y", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func8.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{
+  3.778928257025607*^9, {3.7789287369104986`*^9, 3.7789287949922647`*^9}, {
+   3.7789295921285048`*^9, 3.778929593479762*^9}, {3.778929625887211*^9, 
+   3.7789296412999735`*^9}},
+ CellLabel->"In[72]:=",ExpressionUUID->"57c3872d-75df-43b7-babd-c7190b47e2fd"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.140625`", "2656", GridBox[{
+       {"0.999999999855102`"},
+       {"0.9999999899118521`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "1.0365667240396565`*^-16"},
+    {"\<\"MeshSearch\"\>", "0.109375`", "2189", GridBox[{
+       {"0.9999999955441666`"},
+       {"0.9999999670430201`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "2.8696171302002366`*^-15"},
+    {"\<\"NelderMead\"\>", "0.03125`", "712", GridBox[{
+       {"0.9999999925494195`"},
+       {"0.9999999925494194`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "5.041880050402702`*^-15"},
+    {"\<\"SimulatedAnnealing\"\>", "0.046875`", "1043", GridBox[{
+       {"0.9999999983354549`"},
+       {"0.9999999727164023`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], "9.932777740752736`*^-16"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.140625, 2656, {0.999999999855102, 
+     0.9999999899118521}, 1.0365667240396565`*^-16}, {
+    "MeshSearch", 0.109375, 2189, {0.9999999955441666, 0.9999999670430201}, 
+     2.8696171302002366`*^-15}, {
+    "NelderMead", 0.03125, 712, {0.9999999925494195, 0.9999999925494194}, 
+     5.041880050402702*^-15}, {
+    "SimulatedAnnealing", 0.046875, 1043, {0.9999999983354549, 
+     0.9999999727164023}, 9.932777740752736*^-16}}]]], "Output",
+ CellChangeTimes->{3.778929663462962*^9, 3.778930304267714*^9},
+ CellLabel->
+  "Out[74]//TableForm=",ExpressionUUID->"5edd1dbb-7906-4937-b4c5-\
+144f6de94a94"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor2D", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Sin", "[", 
+           RowBox[{"x", "-", "y"}], "]"}], "^", "2"}], "*", 
+         RowBox[{
+          RowBox[{"Sin", "[", 
+           RowBox[{"x", "+", "y"}], "]"}], "^", "2"}]}], ")"}]}], "/", 
+      RowBox[{"(", 
+       RowBox[{"Sqrt", "[", 
+        RowBox[{
+         RowBox[{"x", "^", "2"}], "+", 
+         RowBox[{"y", "^", "2"}]}], "]"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"y", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func9.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.7789296965154686`*^9, 3.7789298130593615`*^9}, {
+  3.778929957064869*^9, 3.7789299617123685`*^9}, {3.778930095832321*^9, 
+  3.778930129086733*^9}},
+ CellLabel->"In[75]:=",ExpressionUUID->"50b355b5-d857-4b3a-a6b9-f2b2c75cb67e"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.109375`", "2096", GridBox[{
+       {"1.3932490654881473`"},
+       {
+        RowBox[{"-", "9.045802420899534`*^-9"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.6736675211468547`"}]},
+    {"\<\"MeshSearch\"\>", "0.125`", "2558", GridBox[{
+       {
+        RowBox[{"-", "6.645469595985688`*^-9"}]},
+       {
+        RowBox[{"-", "1.3932490871637626`"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.6736675211468545`"}]},
+    {"\<\"NelderMead\"\>", "0.0625`", "2371", GridBox[{
+       {"1.3932490654297216`"},
+       {
+        RowBox[{"-", "7.934517971125507`*^-9"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.6736675211468546`"}]},
+    {"\<\"SimulatedAnnealing\"\>", "0.046875`", "693", GridBox[{
+       {
+        RowBox[{"-", "8.242161704720126`*^-9"}]},
+       {
+        RowBox[{"-", "1.3932490885080417`"}]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.6736675211468545`"}]}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.109375, 2096, {
+     1.3932490654881473`, -9.045802420899534*^-9}, -0.6736675211468547}, {
+    "MeshSearch", 0.125, 
+     2558, {-6.645469595985688*^-9, -1.3932490871637626`}, \
+-0.6736675211468545}, {
+    "NelderMead", 0.0625, 2371, {
+     1.3932490654297216`, -7.934517971125507*^-9}, -0.6736675211468546}, {
+    "SimulatedAnnealing", 0.046875, 
+     693, {-8.242161704720126*^-9, -1.3932490885080417`}, \
+-0.6736675211468545}}]]], "Output",
+ CellChangeTimes->{3.7789299650604663`*^9, 3.778930133491316*^9, 
+  3.7789303072711983`*^9},
+ CellLabel->
+  "Out[77]//TableForm=",ExpressionUUID->"40f1fd5b-218f-40f7-a1a7-\
+3633a9426068"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"table", ",", "trace"}], "}"}], "=", " ", 
+   RowBox[{"evalmonitor2D", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{"Cos", "[", "x", "]"}]}], "*", 
+      RowBox[{"Cos", "[", "y", "]"}], "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"x", "-", "Pi"}], ")"}], "^", "2"}]}], "-", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"y", "-", "Pi"}], ")"}], "^", "2"}]}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"y", ",", 
+         RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Export", "[", 
+   RowBox[{"\"\<func10.csv\>\"", ",", "trace", " ", ",", "\"\<CSV\>\""}], 
+   "]"}], ";"}], "\[IndentingNewLine]", "table"}], "Input",
+ CellChangeTimes->{{3.7789296965154686`*^9, 3.7789298130593615`*^9}, {
+  3.778929957064869*^9, 3.7789299617123685`*^9}, {3.778930095832321*^9, 
+  3.778930129086733*^9}, {3.7789302055102434`*^9, 3.778930267783859*^9}},
+ CellLabel->"In[78]:=",ExpressionUUID->"d5196cfb-91f1-4e54-be53-b7bdbb364e53"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"Method\"\>", "\<\"Evaluation Time\"\>", "\<\"Function Evaluations\"\
+\>", "\<\"x\"\>", "\<\"f(x)\"\>"},
+    {"\<\"DifferentialEvolution\"\>", "0.09375`", "2166", GridBox[{
+       {"3.1415926299171515`"},
+       {"3.1415926297311763`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.9999999999999982`"}]},
+    {"\<\"MeshSearch\"\>", "0.15625`", "3721", GridBox[{
+       {"3.1415926300904227`"},
+       {"3.1415926307320357`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.9999999999999984`"}]},
+    {"\<\"NelderMead\"\>", "0.03125`", "729", GridBox[{
+       {"3.141592630186889`"},
+       {"3.141592630148386`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.9999999999999984`"}]},
+    {"\<\"SimulatedAnnealing\"\>", "0.046875`", "1041", GridBox[{
+       {"1.3049954468141356`"},
+       {"1.3049954436976792`"}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}], 
+     RowBox[{"-", "0.00008110223891570074`"}]}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  TableForm[{{
+    "Method", "Evaluation Time", "Function Evaluations", "x", "f(x)"}, {
+    "DifferentialEvolution", 0.09375, 2166, {3.1415926299171515`, 
+     3.1415926297311763`}, -0.9999999999999982}, {
+    "MeshSearch", 0.15625, 3721, {3.1415926300904227`, 
+     3.1415926307320357`}, -0.9999999999999984}, {
+    "NelderMead", 0.03125, 729, {3.141592630186889, 
+     3.141592630148386}, -0.9999999999999984}, {
+    "SimulatedAnnealing", 0.046875, 1041, {1.3049954468141356`, 
+     1.3049954436976792`}, -0.00008110223891570074}}]]], "Output",
+ CellChangeTimes->{3.778930270177346*^9, 3.778930309609147*^9},
+ CellLabel->
+  "Out[80]//TableForm=",ExpressionUUID->"7f834d78-ee17-4d5d-a112-\
+3117865edbc3"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{766, 782},
+WindowMargins->{{Automatic, -7}, {Automatic, 0}},
+FrontEndVersion->"11.3 for Microsoft Windows (64-bit) (March 6, 2018)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 190, 3, 50, "Chapter",ExpressionUUID->"ae295f21-f530-4b93-9562-3bcafd76120e"],
+Cell[773, 27, 6973, 175, 589, "Input",ExpressionUUID->"2dd0555a-9949-4e67-8add-d97b955fdf60"],
+Cell[CellGroupData[{
+Cell[7771, 206, 1269, 26, 85, "Input",ExpressionUUID->"300d79b3-d69e-47f9-9f27-9da4619e0138"],
+Cell[9043, 234, 1377, 30, 121, "Output",ExpressionUUID->"148c7c4e-01f6-40a5-b8bf-596d4feea320"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10457, 269, 904, 24, 103, "Input",ExpressionUUID->"9774436c-cb63-4681-8730-21a5df0d85c9"],
+Cell[11364, 295, 1290, 29, 115, "Output",ExpressionUUID->"037fa24e-a65f-4c6f-a6b3-fece2c247394"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12691, 329, 1009, 28, 122, "Input",ExpressionUUID->"9e360c03-4880-48a6-9788-44933613c5cc"],
+Cell[13703, 359, 1351, 32, 113, "Output",ExpressionUUID->"14da8794-aba7-4f7c-b3c4-9829eab46357"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15091, 396, 972, 27, 122, "Input",ExpressionUUID->"805d08df-fb20-45de-a934-454a4bc46750"],
+Cell[16066, 425, 1263, 29, 113, "Output",ExpressionUUID->"1cde7058-c375-49b4-97ae-49f460bf3b4a"]
+}, Open  ]],
+Cell[17344, 457, 219, 5, 38, "Input",ExpressionUUID->"68280c27-4b5d-4615-9d56-9d1e367bff6c"],
+Cell[17566, 464, 8641, 222, 739, "Input",ExpressionUUID->"3553bb15-985e-4986-be01-5406ed9bc701"],
+Cell[CellGroupData[{
+Cell[26232, 690, 1390, 39, 123, "Input",ExpressionUUID->"9f53918f-3615-4be1-8d1d-3d83b882460d"],
+Cell[27625, 731, 3591, 84, 169, "Output",ExpressionUUID->"45ee6c06-9db7-4d19-a6c4-eba310f56ef2"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[31253, 820, 1981, 50, 159, "Input",ExpressionUUID->"c9d4c5a9-158e-4f7f-bbf0-53994e36c33d"],
+Cell[33237, 872, 3936, 96, 183, "Output",ExpressionUUID->"da054b23-ddfb-4767-bfa8-507e51901bb6"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[37210, 973, 1382, 41, 122, "Input",ExpressionUUID->"595c417f-fd1b-47ec-8283-bcd13be67d1f"],
+Cell[38595, 1016, 3778, 90, 185, "Output",ExpressionUUID->"8a2d8e0b-1e8e-4b1f-bff1-415726670007"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[42410, 1111, 1623, 48, 159, "Input",ExpressionUUID->"57c3872d-75df-43b7-babd-c7190b47e2fd"],
+Cell[44036, 1161, 3597, 84, 169, "Output",ExpressionUUID->"5edd1dbb-7906-4937-b4c5-144f6de94a94"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[47670, 1250, 1326, 38, 122, "Input",ExpressionUUID->"50b355b5-d857-4b3a-a6b9-f2b2c75cb67e"],
+Cell[48999, 1290, 3852, 97, 177, "Output",ExpressionUUID->"40f1fd5b-218f-40f7-a1a7-3633a9426068"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[52888, 1392, 1316, 36, 122, "Input",ExpressionUUID->"d5196cfb-91f1-4e54-be53-b7bdbb364e53"],
+Cell[54207, 1430, 3655, 88, 169, "Output",ExpressionUUID->"7f834d78-ee17-4d5d-a112-3117865edbc3"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
