@@ -99,9 +99,9 @@ def f_minimize(self, max_iterations, epsilon, var_epsilon, lr, method, N_sample,
 
         #update best particle position, function value
         new_min = np.nanmin(self.function_values) 
-        if new_min < self.best_value:
-            self.best_value = new_min + 0
-            self.best_position  = self.cloud[np.nanargmin(self.function_values)] + 0
+        if new_min < self.best_function_value:
+            self.best_function_value = new_min + 0
+            self.best_particle  = self.cloud[np.nanargmin(self.function_values)] + 0
 
         #update alpha and elapsed_iterations
         alpha += alpha_rate
@@ -202,9 +202,10 @@ def train_nn(self, X, Y,  method, max_epochs, n_batches,  batch_size, lr,
 
             #update best neural_network, cost
             new_min = np.nanmin(costs) 
-            if new_min < self.best_cost:
-                self.best_cost = new_min
-                self.best_nn = self.cloud[np.nanargmin(costs)]
+            if new_min < self.best_function_value:
+                self.best_function_value = new_min
+                self.best_particle_nn = self.cloud[np.nanargmin(costs)]
+                self.best_particle = flatten_weights([self.best_particle_nn],1)[0]
 
             #compute update and cloud variance--------------------------------------
             if method == 'gradient':
@@ -228,7 +229,7 @@ def train_nn(self, X, Y,  method, max_epochs, n_batches,  batch_size, lr,
                 cloudf -= lr * update
             
             elif self.algorithm == 'nesterov':
-                cloudf, yf, lamb = nesterov(cloudf, yf, lamb, elapsed_iterations, lr, update)
+                cloudf, yf, lamb = nesterov(cloudf, yf, lamb, self.elapsed_iterations, lr, update)
             
             elif self.algorithm == 'euler_adaptive':
                 theta = 0.2
@@ -307,7 +308,7 @@ def train_nn(self, X, Y,  method, max_epochs, n_batches,  batch_size, lr,
     if i == (max_epochs - 1): print("Maximum amount of epochs reached")
 
     print("\nCost function value at cloud mean: " + str(cost_mean))
-    print("Best cost was: " + str(self.best_cost))
+    print("Best cost was: " + str(self.best_function_value))
     print("Cost function value (derivative) evaluated {:01} ({:01}) times".format(int(self.elapsed_iterations*self.N),int(gradient_required)*self.elapsed_iterations*self.N))
 
 

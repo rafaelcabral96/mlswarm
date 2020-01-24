@@ -1,2 +1,2 @@
 name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
-Quadratic Function,4,6.968411934891734e-05,[0.00292],8.527701808261124e-06,gradient_free,nesterov_adaptive,12,48,0.004093500000003303,0.0,10000,0,0.0001,0.1,1,0,1,0,0,0
+Quadratic Function,4,3.470225156066024e-05,[0.00012],1.5463005605548694e-08,gradient_free,euler,17,68,0.0049800000000002065,0.0,10000,0,0.0001,0.1,1,0,1,0,0,0

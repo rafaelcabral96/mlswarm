@@ -93,8 +93,8 @@ class function(_swarm):
         self.name = name
         self.function_values = None
         self.cloud_mean_func = None
-        self.best_value = None
-        self.best_position = None
+        self.best_function_value = None
+        self.best_particle = None
         self.gradS_history = []
 
     def init_cloud(self, cloud):
@@ -122,8 +122,8 @@ class function(_swarm):
         self.function_values = self.func(self.cloud.T)
         
         #store best value respective position found. To be updated during optimization
-        self.best_value = np.nanmin(self.function_values) + 0 
-        self.best_position = self.cloud[np.nanargmin(self.function_values)] + 0
+        self.best_function_value = np.nanmin(self.function_values) + 0 
+        self.best_particle = self.cloud[np.nanargmin(self.function_values)] + 0
         
     def evaluate(self, cloud):
 
@@ -162,7 +162,7 @@ class function(_swarm):
         method  (string, default: 'gradient_free'): Optimization method - one of - 'gradient' (using swarm algorithm with gradient info), 'gradient_free' (using swarm algorithm without gradient info), 'gradient_descent' (traditional gradient descent).
         algorithm  (string, default: 'euler_adaptive'): Optimizer - one of - 'euler', 'nesterov', 'euler_adaptive', 'nesterov_adaptive'.
         restart_cloud  (bol, default: False): Restart cloud if convergence position is far away from best position found. New cloud is centered on minimum found and has a 9 time smaller variance.
-        kernel_a (float, default: 0.01): Constant in kernel function. Lower values leads kernel to be more 'spread' and thus particles comunicate more with each other.
+        kernel_a (float, default: 1): Constant in kernel function. Lower values leads kernel to be more 'spread' and thus particles comunicate more with each other.
         alpha_init (float, default: 0): Initial value of alpha constant. Associated with aggregation term that brings particles toguether.
         alpha_rate (float, default: 1): Rate of increase of alpha.
         beta (float, default: 1): Entropy term. Associated with term that brings particles apart and promotes search. Only relevant when using 'gradient' method.
@@ -183,14 +183,14 @@ class function(_swarm):
         print("Cloud mean: " + str(self.cloud_mean) )
         print("Function value at cloud mean: " + str(self.cloud_mean_func))
         print("Function value evaluated {:01} times".format(self.function_evaluations))
-        print("Best Particle at position: " + str(self.best_position) + " with function value: " + str(self.best_value))
+        print("Best Particle at position: " + str(self.best_particle) + " with function value: " + str(self.best_function_value))
 
         #restart cloud at lowest position
         restart_cloud = parameters[6]
         if restart_cloud:
 
-            cond1 = (self.cloud_mean_func > self.best_value)
-            cond2 = (np.abs(self.best_value - self.cloud_mean_func) > 0.001)
+            cond1 = (self.cloud_mean_func > self.best_function_value)
+            cond2 = (np.abs(self.best_function_value - self.cloud_mean_func) > 0.001)
 
             if cond1 & cond2:
 
@@ -198,7 +198,7 @@ class function(_swarm):
                 print("Cloud converged far away from lowest function value found")
                 print("Restarting cloud centered on lowest function value")
 
-                new_cloud = ((self.cloud_0 - np.mean(self.cloud_0, axis=0) )/3  + self.best_position.T)
+                new_cloud = ((self.cloud_0 - np.mean(self.cloud_0, axis=0) )/3  + self.best_particle.T)
                 new_cloud_var = np.mean(get_var(new_cloud))
 
                 cond3 = (new_cloud_var > var_epsilon)
@@ -268,8 +268,9 @@ class neuralnet(_swarm):
         self.architecture = architecture
         self.num_variables = sum( [layer["input_dim"] * layer["output_dim"] + layer["output_dim"] for layer in architecture])
         self.gradS_history = False
-        self.best_cost = np.inf
-        self.best_nn = None
+        self.best_function_value = np.inf
+        self.best_particle = None
+        self.best_particle_nn = None
     
     def init_cloud(self, N, cloud_type = "spread", seed = 42, dispersion_factor = 6, seed_between = 43, dispersion_factor_between = 0):
         self.N = N
@@ -288,6 +289,32 @@ class neuralnet(_swarm):
 
 
     def train(self, X, Y, parameters_dic = {}):
+
+
+        """Optimize function acording to hyperparameters specified in parameters_dic.
+
+        Parameters:
+        parameters_dic (dic): Dictionary containing hyperparameters. See below.
+
+        parameters_dic:
+
+        max_epochs (int, default: 500): Maximum amount of epochs.  
+        n_batches  (int, default: 1): number of batches in each epoch
+        batch_size (int, dataset size): size of each batch (<= to dataset size)
+        var_epsilon (float, default:0.0001): Convergence achieved when cloud variance is below var_epsilon.
+        learning_rate (float, default:0.01): Learning rate of step size.
+        method  (string, default: 'gradient_free'): Optimization method - one of - 'gradient' (using swarm algorithm with gradient info), 'gradient_free' (using swarm algorithm without gradient info), 'gradient_descent' (traditional gradient descent).
+        algorithm  (string, default: 'euler_adaptive'): Optimizer - one of - 'euler', 'nesterov', 'euler_adaptive', 'nesterov_adaptive'.
+        cost_type  (string, default: 'rmse'): 'cross_entropy_binary','cross_entropy_softmax','error_classification', 'rmse'
+        kernel_a (float, default: 1): Constant in kernel function. Lower values leads kernel to be more 'spread' and thus particles comunicate more with each other.
+        alpha_init (float, default: 0): Initial value of alpha constant. Associated with aggregation term that brings particles toguether.
+        alpha_rate (float, default: 1): Rate of increase of alpha.
+        beta (float, default: 1): Entropy term. Associated with term that brings particles apart and promotes search. Only relevant when using 'gradient' method.
+        gamma (float, default: 0): Initial value of gamma constant. Associated with term that promotes cloud to have a gaussian structure.
+        verbose (bol, default: False): Print basic cloud information in each iteration.
+        track_history = d.get('track_history', True): Stores cloud history information necessary to do some plots. Slows down optimization.
+        
+        """
 
         #get parameters from parameters_dic
         parameters = get_parameters_nn(self, X, Y, parameters_dic)
@@ -316,7 +343,7 @@ class neuralnet(_swarm):
         print("Test set accuracy using cloud mean: {:.5f}".format(acc_test))
 
     def prediction_accuracy_best_particle(self, X_test, Y_test, acc_type):
-        Y_test_hat = self.forward_propagation(X_test, self.best_nn)
+        Y_test_hat = self.forward_propagation(X_test, self.best_particle_nn)
         acc_test = get_accuracy_value(Y_test_hat, Y_test, acc_type)
         print("Test set accuracy using best neuralnet: {:.5f}".format(acc_test))
 

@@ -59,6 +59,7 @@ def gradS(cloud,kernel_a):
 ##UTILS FUNCTIONS FOR NEURALNET CLASS---------------------------------------------------------
 
 def flatten_weights(cloud,N):
+
     tensor_names = list(cloud[0].keys())
 
     nn_shape = []

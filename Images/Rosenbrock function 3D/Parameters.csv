@@ -1,2 +1,2 @@
 name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
-Rosenbrock function 3D,25,0.00825801110653664,[0.93023 0.86681],5.0879525055726885e-03,gradient_free,euler_adaptive,63,1575,0.03204700000014782,0.03125,10000,0,0.01,0.01,1,0,1,0,0,0
+Rosenbrock function 3D,25,0.00825801110653664,[0.93023 0.86681],5.0879525055726885e-03,gradient_free,euler_adaptive,63,1575,0.026665999999998746,0.03125,10000,0,0.01,0.01,1,0,1,0,0,0
