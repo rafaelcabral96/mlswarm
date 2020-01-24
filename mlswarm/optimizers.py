@@ -27,7 +27,7 @@ def update_cloud_derivative_free(self, cloudf, cost, lr, N, kernel_a, alpha, bet
     gamma2 = alpha
 
     #attraction position for aggregation term -> could be cloud_mean or self.best_particle
-    attraction_position = cloud_mean
+    attraction_position = self.best_particle
 
     update =  ( np.einsum('ij,jk -> ik', kernels, np.einsum('j,jk -> jk',(cost + gamma1),omega) + gamma2*(cloudf-attraction_position))  + np.einsum('j,ijk -> ik', cost + gamma1, gkernels) )  * float(1/N)
 
