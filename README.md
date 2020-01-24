@@ -2,7 +2,7 @@
 
 This package trains neural networks using swarm-like optimization algorithms. 
 
-By flattening the weights of a neural network, network training can be seen as a problem of directly minimizing a multivariate (cost) function. In this framework, particle swarm optimization algorithms can be used to minimize this multivariate function, where each particle will have a set of neural network weights associated with it.
+By flattening the weights of a neural network, network training can be seen as a problem of directly minimizing a multivariate (cost) function. In this framework, particle swarm optimization algorithms can be used to minimize this multivariate function, where each particle will have the set of neural network weights associated with it.
 
 The package also includes a gradient free variant of the optimization algorithm, where no backpropagation is required. Some advantages are listed at the end.
 
@@ -14,20 +14,32 @@ Diogo A. Gomes (2019). DERIVATIVE FREE OPTIMIZATION USING GAUSSIAN CLOUD ?
 1. *neuralnet* - train neural networks
 2. *function* - minimize functions
 
-For a *neuralnet* object there are three main methods (see examples):
-1. nn = neuralnet(...) - define neural network architecture and create neural network
-2. nn = init_cloud(N) - Initialize cloud with N particles
-3. nn.train(...) - Define the training data, algorithm parameters and start the algorithm
-
 For a *function* object there are three main methods (see examples):
 1. func = function(lambda x: ...) - create a function object 
 2. func = init_cloud(...) - Define array of initial particle positions
-3. func.minimize(...) - Define the algorithms parameters and start the algorithm
+3. func.minimize(...) - Define the algorithm's parameters and start the algorithm
+
+For a *neuralnet* object there are three main methods (see examples):
+1. nn = neuralnet(...) - define neural network architecture and create neural network
+2. nn = init_cloud(N) - Initialize cloud with N particles
+3. nn.train(...) - Define the training data, algorithm parameter's and start the algorithm
 
 There are three available optimization algorithms:
-1. *swarm* - swarm-like optimization algorithm
-2. *swarm_derivfree* - similar to the former but derivative free, by using gaussian clouds
+1. *gradient* - swarm-like optimization algorithm
+2. *gradient_free* - similar to the former but derivative free, by using gaussian clouds
 3. *gradient_descent* - gradient descent optimization
+
+There are four ways of updating the particle cloud:
+1. *euler* - new_cloud = old_cloud - dt * gradient
+2. *euler_adaptive* - same as *euler* but with adaptive step size (dt)
+3. *nesterov* - nesterov update
+4. *nesterov_adaptive* - nesterov update with adaptive restart
+
+##Tips
+1. The method "plot_everything" plots particle's positions and values over iterations and other statistics of the *function* object
+2. The plot of 3D functions takes a bit of time
+
+
 
 ## Examples
 Jupyter notebook examples can be found on the [github page](https://github.com/rafaelcabral96/mlswarm) that perform:

@@ -1,2 +1,2 @@
 name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
-pol_and_cosine,5,8.237666663545097e-05,[-0.00106],9.045920959839052e-05,gradient_free,euler_adaptive,21,105,0.008085100000000622,0.0,10000,0,0.0001,0.01,1,0,1,0,0,0
+pol_and_cosine,5,7.75643331695888e-05,[-0.00403],1.3003015397154395e-03,gradient_free,nesterov,23,115,0.009696200000000488,0.015625,10000,0,0.0001,0.01,1,0,1,0,0,0

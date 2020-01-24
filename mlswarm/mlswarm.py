@@ -294,6 +294,8 @@ class neuralnet(_swarm):
         """Optimize function acording to hyperparameters specified in parameters_dic.
 
         Parameters:
+        X (array): Training data input
+        Y (array): Training data output
         parameters_dic (dic): Dictionary containing hyperparameters. See below.
 
         parameters_dic:

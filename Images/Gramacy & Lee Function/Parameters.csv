@@ -1,2 +1,2 @@
 name,N,cloud_var,cloud_mean,cloud_mean_func,train_method,train_algorithm,elapsed_iterations,function_evaluations,clock_time,cpu_time,max_iterations,epsilon,var_epsilon,learning_rate,kernel_a,alpha_init,alpha_rate,beta,gamma,gamma_rate
-Gramacy & Lee Function,6,0.009263706755454763,[0.13412],-2.711337568893529e+00,gradient_free,euler_adaptive,141,846,0.05266579999999976,0.046875,10000,0,0.01,0.01,1,0,1,0,0,0
+Gramacy & Lee Function,6,0.009263706755454763,[0.13412],-2.711337568893529e+00,gradient_free,euler_adaptive,141,846,0.05535940000000039,0.078125,10000,0,0.01,0.01,1,0,1,0,0,0

@@ -20,7 +20,7 @@ def update_cloud_derivative_free(self, cloudf, cost, lr, N, kernel_a, alpha, bet
     kernels = np.exp(-kernel_a*norm/cloud_var_mean)
     gkernels = -2*(kernel_a/cloud_var_mean)*np.einsum('ijk,ij -> ijk',params_diff_matrix,kernels)
 
-    #compute (x - x_mean)/var, a difference variance is considered for each dimension
+    #compute (x - x_mean)/var, a different variance is considered for each dimension
     omega = np.einsum('ij,j -> ij', cloudf-cloud_mean, 1/cloud_var) 
 
     gamma1 = gamma
