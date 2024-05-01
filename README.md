@@ -1,15 +1,51 @@
 # Overview
 
-This package trains neural networks using swarm-like optimization algorithms. 
+This package trains neural networks and minimizes functions using swarm-like optimization algorithms. 
 
 By flattening the weights of a neural network, network training can be seen as a problem of directly minimizing a multivariate (cost) function. In this framework, particle swarm optimization algorithms can be used to minimize this multivariate function, where each particle will have the set of neural network weights associated with it.
 
 The package also includes a gradient free variant of the optimization algorithm, where no backpropagation is required. Some advantages are listed at the end.
 
-## Relevant article
-Diogo A. Gomes (2019). DERIVATIVE FREE OPTIMIZATION USING GAUSSIAN CLOUD ?
+## Installation
 
-## Description
+The package can be installed by:
+
+```
+pip install mlswarm
+```
+
+## Main idea
+
+Swarm-like optimization algorithms differ from the traditional gradient descent in that they a cloud of "particles" that moves through the parameter space.
+
+Auckley function          |  Particle swarm            | Gradient descent
+:-------------------------:|:-------------------------:|:-------------------------:
+![]([https://...Dark.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot1.png))  |  ![]([https://...Ocean.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot2.png)) |  ![]([https://...Ocean.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot3.png))
+
+It is particularly effective in optimizing non-convex functions. The second plot shows the cloud of 25 points on the top right and it's evolution trough the iterations until reaching the minimum at the origin. The third plot shows the results using gradient descent (only one particle), where the optimization was stuck on a local minumum.
+
+It's ability to overcome local minumuns is due to the fact that particles "communicate" with each other.  We replace the problem of minimizing $f$ by the equivalent problem of minimizing
+$F[m]=\int_{\mathbb{R}^{d}} f(x) m(x) d x$, where $m$ is a Gaussian measure. for better results, we consider the equivalent problem of minimizing:
+
+$$
+\min _{m \in \mathcal{P}\left(\mathbb{R}^{d}\right)} F[m]+\gamma G[m]+\beta H[m],
+$$
+
+where $G[m] = \int_{\mathbb{R}^{d}} \int_{\mathbb{R}^{d}} \frac{|x-y|^{2}}{2} m(x) m(y) d x d y$ is an attractor term that promotes aggregation (particles kept togueter) and $H[m] = \int_{\mathbb{R}^{d}} m(x) \ln m(x) d x$ is an entropy term that promotes parameter exploration (particles are repelled). 
+
+In practice we consider a discrete measure $m_0=\frac{1}{N} \sum_{i=1}^N \delta_{x_i}$, where each $x_i$ is a particle. The previous equations simplify and we get the Euler squeme:
+$$
+x_{k+1}^{i}=x_{k}^{i}-\eta\left(F_{m}\left(x_{k}^{i}\right)+\gamma G_{m}\left(x_{k}^{i}\right)+\betaP_{m}\left(x_{k}^{i}\right)\right)
+$$
+There is also an algorithm implementation based on Nesterov’s accelerated method.
+
+We compared our algorithm with Nelder-Mead, Differential Evolution, Mesh Search, and Simulated Annealing, and it reaches the minmum in about 10x-50x less function evaluations.  
+
+## Relevant article
+
+Gomes, Alexandra A., and Diogo A. Gomes. "Derivative-Free Global Minimization in One Dimension: Relaxation, Monte Carlo, and Sampling." arXiv preprint arXiv:2308.09050 (2023).
+
+## Main Functions
 **mlswarm** contains two operable classes:
 1. *neuralnet* - train neural networks
 2. *function* - minimize functions
@@ -35,15 +71,10 @@ There are four ways of updating the particle cloud:
 3. *nesterov* - nesterov update
 4. *nesterov_adaptive* - nesterov update with adaptive restart
 
-##Tips
-1. The method "plot_everything" plots particle's positions and values over iterations and other statistics of the *function* object
-2. The plot of 3D functions takes a bit of time
-
-
 
 ## Examples
 Jupyter notebook examples can be found on the [github page](https://github.com/rafaelcabral96/mlswarm) that perform:
-1. Minimization of univariate and multivariate functions
+1. Minimization of univariate and multivariate non-convex functions
 2. Linear Regression
 3. Logistic Regression
 4. Binary classification with 4-Layer Neural Network
