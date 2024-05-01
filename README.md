@@ -33,7 +33,7 @@ where $G[m] = \int_{\mathbb{R}^{d}} \int_{\mathbb{R}^{d}} \frac{|x-y|^{2}}{2} m(
 In practice we consider a discrete measure $m_0=\frac{1}{N} \sum_{i} \delta_{x_i}$, where each $x_i$ is a particle. The previous equations simplify, and we get the Euler scheme:
 
 $$
-x_{k+1}^i=x_k^i-\eta ( F_m (x_k^i)+ \gamma G_m(x_k^i)+ \beta P_m(x_k^i))
+x_{k+1}^i=x_k^i-\eta ( F_m (x_k^i)+ \gamma G_m(x_k^i)+ \beta H_m(x_k^i))
 $$
 
 There is also an algorithm implementation based on Nesterov's accelerated method.
