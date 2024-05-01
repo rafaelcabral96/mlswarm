@@ -20,7 +20,7 @@ Swarm-like optimization algorithms differ from the traditional gradient descent 
 
 Auckley function          |  Particle swarm            | Gradient descent
 :-------------------------:|:-------------------------:|:-------------------------:
-![]([https://...Dark.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot1.png))  |  ![]([https://...Ocean.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot2.png)) |  ![]([https://...Ocean.png](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot3.png))
+![](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot1.png)  |  ![](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot2.png) |  ![](https://github.com/rafaelcabral96/mlswarm/blob/master/Images/plot3.png)
 
 It is particularly effective in optimizing non-convex functions. The second plot shows the cloud of 25 points on the top right and it's evolution trough the iterations until reaching the minimum at the origin. The third plot shows the results using gradient descent (only one particle), where the optimization was stuck on a local minumum.
 
