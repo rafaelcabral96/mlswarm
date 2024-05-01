@@ -31,9 +31,11 @@ $$
 where $G[m] = \int_{\mathbb{R}^{d}} \int_{\mathbb{R}^{d}} \frac{|x-y|^{2}}{2} m(x) m(y) d x d y$ is an attractor term that promotes aggregation (particles kept together) and $H[m] = \int_{\mathbb{R}^{d}} m(x) \ln m(x) d x$ is an entropy term that promotes parameter exploration (particles are repelled). 
 
 In practice we consider a discrete measure $m_0=\frac{1}{N} \sum_{i} \delta_{x_i}$, where each $x_i$ is a particle. The previous equations simplify, and we get the Euler scheme:
+
 $$
-x_{k+1}^i=x_k^i-\eta ( F_m (x_k^i)+ \gammaG_m(x_k^i)+ \beta P_m(x_k^i) )
+x_{k+1}^i=x_k^i-\eta ( F_m (x_k^i)+ \gamma G_m(x_k^i)+ \beta P_m(x_k^i))
 $$
+
 There is also an algorithm implementation based on Nesterov's accelerated method.
 
 By flattening the weights of a neural network, network training can be seen as a problem of directly minimizing a multivariate (cost) function. Then, particle swarm optimization algorithms can be used to minimize this multivariate function, where each particle will have a set of neural network weights associated with it.
