@@ -14,7 +14,7 @@ pip install mlswarm
 
 ## Main idea
 
-Unlike traditional gradient descent that uses a single path, swarm-like optimization algorithms employ a group of "particles" that explore the parameter space collectively. 
+Unlike traditional gradient descent which uses a single path, swarm-like optimization algorithms employ a group of "particles" that explore the parameter space collectively. 
 
 Auckley function          |  Particle swarm            | Gradient descent
 :-------------------------:|:-------------------------:|:-------------------------:
@@ -42,7 +42,7 @@ By flattening the weights of a neural network, network training can be seen as a
 
 ## Relevant article
 
-Gomes, Alexandra A., and Diogo A. Gomes. "Derivative-Free Global Minimization in One Dimension: Relaxation, Monte Carlo, and Sampling." arXiv preprint arXiv:2308.09050 (2023).
+Gomes, Alexandra A., and Diogo A. Gomes. "Derivative-Free Global Minimization in One Dimension: Relaxation, Monte Carlo, and Sampling." arXiv preprint (2023).
 
 ## Main Functions
 **mlswarm** contains two operable classes:
